@@ -1,0 +1,77 @@
+name: release-windows
+
+on:
+  push:
+    tags:
+      - 'v*'           # run on git tags like v1.2.3; adjust if you prefer manual dispatch
+  workflow_dispatch:
+# omg i wasted a day and 4 hourse for this
+# -tuxebro, 2025
+jobs:
+  build-and-test:
+    name: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows]
+    runs-on: ${{ matrix.os }}-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.2'   # change to your Go version
+
+      - name: Install MSYS2 and MinGW
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          cache: true
+          install: >-
+            mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-libvips
+      
+      # help me, it took me more than 10 hours, trying to fix libvips and vips-gen omg why windows even exist
+      # -tuxebro, 2025
+      - name: Are you sure? LIBVIPS! WHERE'S LIBVIPS? I NEED YOU LIBVIPS!!! Pretty sure. I am viping it, I am libviping it so good! WHERE IS HE???
+        run: pkg-config --libs --cflags vips
+        shell: msys2 {0}
+
+      - name: Fetch libvips
+        run: |
+          curl -L -o vips.zip https://github.com/libvips/build-win64-mxe/releases/download/v8.17.1/vips-dev-w64-web-8.17.1.zip
+          tar -xf vips.zip
+        shell: cmd
+
+      - name: Copy Libvips DLLs
+        run: |
+          Get-ChildItem -Path "${{ github.workspace }}\\vips-dev-8.17\\bin" -Filter "*.dll" -Recurse | Move-Item -Destination "${{ github.workspace }}"
+        shell: powershell
+
+      # dear tuxebro from the past, after hours of breaking bones
+      # i finally found the answer
+      # 
+      # dear code reader, if you are wondering how to integrate vipsgen with Github Actions, Goreleaser and what not
+      # here you go, you could take some inspirations from me.
+      #
+      # -tuxebro, 2025 from few hours ago
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          # 'latest', 'nightly', or a semver
+          version: "latest"
+          args: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CGO_ENABLED: 1
+          CGO_CFLAGS: "-I${{ github.workspace }}\\vips-dev-8.17\\include -I${{ github.workspace }}\\vips-dev-8.17\\include\\glib-2.0 -I${{ github.workspace }}\\vips-dev-8.17\\lib\\glib-2.0\\include -ID:\\a\\_temp\\msys64\\mingw64\\include -ID:\\a\\_temp\\msys64\\mingw64\\include\\glib-2.0 -ID:\\a\\_temp\\msys64\\mingw64\\lib\\glib-2.0\\include"
+          CGO_LDFLAGS: "-L${{ github.workspace }}\\vips-dev-8.17\\lib -LD:\\a\\_temp\\msys64\\mingw64\\lib"
+          PKG_CONFIG_PATH: "${{ github.workspace }}\\vips-dev-8.17\\lib\\pkgconfig"
