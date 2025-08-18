@@ -31,6 +31,7 @@ func main() {
 					Usage:    "Specify where the optimized pack will be.", 
 					Required: false,
 				},
+				
 			},
 			Action: func(ctx context.Context, cmd *cli.Command) error {
 				inPath  := cmd.String("in")
