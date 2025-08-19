@@ -21,6 +21,10 @@ func SortFiles(files *[]string, tempPackDir string) (types.SortedFiles) {
 		switch ext {
 		case ".json":
 			sorted.JSON = append(sorted.JSON, file)
+		case ".json5":
+			sorted.JSON = append(sorted.JSON, file)
+		case ".jsonc":
+			sorted.JSON = append(sorted.JSON, file)
 		case ".lang":
 			sorted.LANG = append(sorted.LANG, file)
 		case ".png":
