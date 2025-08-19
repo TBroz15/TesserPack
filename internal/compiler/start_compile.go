@@ -16,8 +16,8 @@ import (
 
 // Do some preparation before compilation
 func StartCompile(conf *types.Config) error {
-	var waitGroup = sync.WaitGroup{}
-	var instanceChecker = instancechecker.New()
+	waitGroup := sync.WaitGroup{}
+    instanceChecker := instancechecker.New()
 	
 	inPathStat, err := os.Stat(conf.InPath)
 	if (err != nil) {return err} // it can also check if file/dir does not exist

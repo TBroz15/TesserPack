@@ -23,8 +23,8 @@ import (
 func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Config) (error) {
 	fmt.Printf("Compiling \"%v\"\n", originalInPath)
 
-	var waitGroup sync.WaitGroup
-	var mutex sync.RWMutex
+	waitGroup := sync.WaitGroup{}
+	mutex := sync.RWMutex{}
 
 	files := []string{}
 
