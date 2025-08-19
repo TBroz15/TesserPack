@@ -11,6 +11,7 @@ import (
 	"path"
 	"path/filepath"
 	"tesserpack/internal/helpers"
+	"tesserpack/internal/types"
 
 	"github.com/charlievieth/fastwalk"
 	"github.com/phuslu/shardmap"
@@ -19,7 +20,7 @@ import (
 	"sync"
 )
 
-func Compile(inPath, outPath, tempPackDir string) (error) {
+func Compile(inPath, outPath, tempPackDir string, conf *types.Config) (error) {
 	fmt.Printf("Compiling \"%v\"\n", inPath)
 
 	var waitGroup sync.WaitGroup
@@ -27,12 +28,12 @@ func Compile(inPath, outPath, tempPackDir string) (error) {
 
 	files := []string{}
 
-	conf := fastwalk.Config{
+	fastWalkConf := fastwalk.Config{
 		Follow: true,
 		ToSlash: false,
 	}
 
-	err := fastwalk.Walk(&conf, inPath, func(path string, entry fs.DirEntry, err error) error {
+	err := fastwalk.Walk(&fastWalkConf, inPath, func(path string, entry fs.DirEntry, err error) error {
 		if (err != nil) {return err}
 
 		rel, err := filepath.Rel(inPath, path)
@@ -69,7 +70,7 @@ func Compile(inPath, outPath, tempPackDir string) (error) {
 		srcFile := path.Join(inPath, JSONFile)
 		outFile := path.Join(tempPackDir, JSONFile)
 
-		go StripJSON(srcFile, outFile, &waitGroup)
+		go StripJSON(srcFile, outFile, &waitGroup, conf)
 	}
 
 	for _, LANGFile := range sortedFiles.LANG {

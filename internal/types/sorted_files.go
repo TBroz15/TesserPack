@@ -1,9 +1,11 @@
 package types
 
 type SortedFiles struct {
-	JSON []string
-	LANG []string
-	PNG  []string
-	JPG  []string
-	ETC  []string
+	JSONC []string
+	JSON5 []string
+	JSON  []string
+	LANG  []string
+	PNG   []string
+	JPG   []string
+	ETC   []string
 }

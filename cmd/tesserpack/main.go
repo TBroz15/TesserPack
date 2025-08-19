@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"tesserpack/internal/compiler"
+	"tesserpack/internal/types"
 
 	"github.com/urfave/cli/v3"
 )
@@ -31,13 +32,25 @@ func main() {
 					Usage:    "Specify where the optimized pack will be.", 
 					Required: false,
 				},
-				
+				&cli.StringFlag{
+					Name:     "strict-json",
+					Aliases:  []string{"sj"},
+					Usage:    "TesserPack will assume every .json file has no comments.", 
+					Required: false,
+				},
 			},
 			Action: func(ctx context.Context, cmd *cli.Command) error {
-				inPath  := cmd.String("in")
-				outPath := cmd.String("out")
+				inPath       := cmd.String("in")
+				outPath      := cmd.String("out")
+				isStrictJSON := cmd.Bool("strict-json")
+
+				conf := types.Config{
+					InPath:       inPath,
+					OutPath:      outPath,
+					IsStrictJSON: isStrictJSON,
+				} 
 	
-				err := compiler.StartCompile(inPath, outPath)
+				err := compiler.StartCompile(&conf)
 	
 				return err
 			},

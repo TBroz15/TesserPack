@@ -9,19 +9,20 @@ import (
 	"sync"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/helpers/instancechecker"
+	"tesserpack/internal/types"
 
 	"github.com/saracen/fastzip"
 )
 
 // Do some preparation before compilation
-func StartCompile(inPath, outPath string) error {
+func StartCompile(conf *types.Config) error {
 	var waitGroup = sync.WaitGroup{}
 	var instanceChecker = instancechecker.New()
 	
-	inPathStat, err := os.Stat(inPath)
+	inPathStat, err := os.Stat(conf.InPath)
 	if (err != nil) {return err} // it can also check if file/dir does not exist
 
-	inPathAbs, err := filepath.Abs(inPath)
+	inPathAbs, err := filepath.Abs(conf.InPath)
 	if (err != nil) {return err}
 
 	// just get the name itself, dont include file extension
@@ -36,22 +37,22 @@ func StartCompile(inPath, outPath string) error {
 	tempPackDir, err := helpers.MkTempPackDir(inPathBase)
 	if (err != nil) {return err}
 
-	if (outPath == "") {
-		outPath = filepath.Join(
+	if (conf.OutPath == "") {
+		conf.OutPath = filepath.Join(
 			filepath.Dir(inPathAbs),
 			// add extra copium for the user by adding "-optimized" to the name.
 			// the optimization is real actually -TuxeBro, 2025
 			inPathBase + "-optimized.mcpack",
 		)
-	} else if (!strings.Contains(filepath.Base(outPath), ".")) {
+	} else if (!strings.Contains(filepath.Base(conf.OutPath), ".")) {
 		return fmt.Errorf("output path is a directory, expected to be a file")
 	}
 
 	// create dir recursively, just in case if dir parents does not exist
-	err = os.MkdirAll(filepath.Dir(outPath), 0700)
+	err = os.MkdirAll(filepath.Dir(conf.OutPath), 0700)
 	if (err != nil) {return err}
 
-	outPathAbs, err := filepath.Abs(outPath)
+	outPathAbs, err := filepath.Abs(conf.OutPath)
 	if (err != nil) {return err}
 
 	instanceChecker.CheckLock()
@@ -60,7 +61,7 @@ func StartCompile(inPath, outPath string) error {
 	// If user is trying to compile a dir
 
 	if (inPathStat.IsDir()) {
-		Compile(inPathAbs, outPathAbs, tempPackDir)
+		Compile(inPathAbs, outPathAbs, tempPackDir, conf)
 
 		os.RemoveAll(tempPackDir)
 		return nil
@@ -79,10 +80,9 @@ func StartCompile(inPath, outPath string) error {
   		return err
 	}
 
-	Compile(tempUnzippedPackDir, outPathAbs,tempPackDir)
+	Compile(tempUnzippedPackDir, outPathAbs, tempPackDir, conf)
 
 	dirsToClean := []string{tempPackDir,tempUnzippedPackDir}
-
 	for _, dir := range dirsToClean {
 		waitGroup.Add(1)
 		go func(path string) {
