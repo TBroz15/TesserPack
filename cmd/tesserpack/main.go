@@ -32,7 +32,7 @@ func main() {
 					Usage:    "Specify where the optimized pack will be.", 
 					Required: false,
 				},
-				&cli.StringFlag{
+				&cli.BoolFlag{
 					Name:     "strict-json",
 					Aliases:  []string{"sj"},
 					Usage:    "TesserPack will assume every .json file has no comments.", 
