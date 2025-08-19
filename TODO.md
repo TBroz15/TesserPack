@@ -1,9 +1,10 @@
 ## TODO (for TuxeBro)
 
 - [x] Implement main features (such as JSON, assets, and zip compression)
-- [ ] JSON5 support & Config (pack devs will like this)
+- [x] JSON5 support (pack devs will like this)
 - [ ] Caching
 - [ ] Proper error checking
+- [ ] Config
 - [ ] GUI w/ wails (so people wont just type in their terminal to look like some sort of hacker) (TBD by v1.0)
 - [ ] Minify JS & TS through ESBuild (TBD by v1.1)
 - [ ] Regolith Integration
