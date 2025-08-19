@@ -20,8 +20,8 @@ import (
 	"sync"
 )
 
-func Compile(inPath, outPath, tempPackDir string, conf *types.Config) (error) {
-	fmt.Printf("Compiling \"%v\"\n", inPath)
+func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Config) (error) {
+	fmt.Printf("Compiling \"%v\"\n", originalInPath)
 
 	var waitGroup sync.WaitGroup
 	var mutex sync.RWMutex
@@ -167,7 +167,8 @@ func Compile(inPath, outPath, tempPackDir string, conf *types.Config) (error) {
   		return err
 	}
 
-	fmt.Printf("Successfully compiled \"%v\"\n", filepath.Base(inPath))
+	fmt.Printf("Successfully optimized \"%v\"\n", filepath.Base(originalInPath))
+	fmt.Printf("Optimized pack is located at \"%v\"\n", outPath)
 
 	return nil
 }

@@ -61,7 +61,7 @@ func StartCompile(conf *types.Config) error {
 	// If user is trying to compile a dir
 
 	if (inPathStat.IsDir()) {
-		Compile(inPathAbs, outPathAbs, tempPackDir, conf)
+		Compile(inPathAbs, inPathAbs, outPathAbs, tempPackDir, conf)
 
 		os.RemoveAll(tempPackDir)
 		return nil
@@ -80,7 +80,7 @@ func StartCompile(conf *types.Config) error {
   		return err
 	}
 
-	Compile(tempUnzippedPackDir, outPathAbs, tempPackDir, conf)
+	Compile(tempUnzippedPackDir, inPathAbs, outPathAbs, tempPackDir, conf)
 
 	dirsToClean := []string{tempPackDir,tempUnzippedPackDir}
 	for _, dir := range dirsToClean {
