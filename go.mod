@@ -4,7 +4,7 @@ go 1.24.2
 
 require (
 	github.com/charlievieth/fastwalk v1.0.12
-	github.com/cshum/vipsgen v1.1.1
+	github.com/cshum/vipsgen v1.1.2
 	github.com/goccy/go-json v0.10.5
 	github.com/gofrs/flock v0.12.1
 	github.com/phuslu/shardmap v0.0.0-20230929024548-c0f3d8a4fccd

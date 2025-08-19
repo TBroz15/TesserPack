@@ -2,6 +2,8 @@ github.com/charlievieth/fastwalk v1.0.12 h1:pwfxe1LajixViQqo7EFLXU2+mQxb6OaO0CeN
 github.com/charlievieth/fastwalk v1.0.12/go.mod h1:yGy1zbxog41ZVMcKA/i8ojXLFsuayX5VvwhQVoj9PBI=
 github.com/cshum/vipsgen v1.1.1 h1:uOYVqHE3+zJ8qOJIeEYspJJl64Kpw48MnLkB+FEsMZE=
 github.com/cshum/vipsgen v1.1.1/go.mod h1:1GboZQcNmo4NwuNnGogM24m3O+1i6UpnvurqMcsFItE=
+github.com/cshum/vipsgen v1.1.2 h1:7kFUxlCBx4bAd69YwWagOGYC8/7vkXJuzCFV6tmPYvU=
+github.com/cshum/vipsgen v1.1.2/go.mod h1:1GboZQcNmo4NwuNnGogM24m3O+1i6UpnvurqMcsFItE=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/goccy/go-json v0.10.5 h1:Fq85nIqj+gXn/S5ahsiTlK3TmC85qgirsdTP/+DeaC4=
