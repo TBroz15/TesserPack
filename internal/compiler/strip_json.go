@@ -34,15 +34,15 @@ func StripJSON(srcFile string, outFile string, waitGroup *sync.WaitGroup, conf *
 	var out []byte
 
 	switch {
-	case jsonExt == ".jsonc" || (jsonExt == ".json" && conf.IsStrictJSON):
+	case jsonExt == ".jsonc" || (jsonExt == ".json" && !conf.IsStrictJSON):
 		strippedComments := jsonc.ToJSONInPlace(fileContent)
-		var result *bytes.Buffer
+		result := new(bytes.Buffer)
 		err = json.Compact(result, strippedComments)
 
 		out = result.Bytes()
 
 	case jsonExt == ".json":
-		var result *bytes.Buffer
+		result := new(bytes.Buffer)
 		err = json.Compact(result, fileContent)
 
 		out = result.Bytes()
@@ -62,7 +62,9 @@ func StripJSON(srcFile string, outFile string, waitGroup *sync.WaitGroup, conf *
 		fmt.Printf("Error Optimizing JSON \"%v\", copying the JSON instead: %v\n", srcFile, err)
 
 		err := helpers.LinkOrCopy(srcFile, outFile)		
-		if (err != nil) {fmt.Printf("Error Copying \"%v\": %v\n", srcFile, err)}
+		if err != nil {
+			fmt.Printf("Error Copying \"%v\": %v\n", srcFile, err)
+		}
 
 		return
 	}
