@@ -121,30 +121,23 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 
 	shardedCompiledFiles := shardmap.New[string, os.FileInfo](len(files))
 	
-	// os.Stat is slow, multithread it
-	for _, file := range files {
-		compiledFile := path.Join(tempPackDir, file)
+	err = fastwalk.Walk(&fastWalkConf, tempPackDir, func(compiledFile string, entry fs.DirEntry, err error) error {
+		if (err != nil) {return err}
+		if (entry.IsDir()) {return nil}
 
-		waitGroup.Add(1)
-		go func(compiledFile string) {
-			info, err := os.Stat(compiledFile)
+		info, err := os.Stat(compiledFile)
 
-			if (err != nil) {
-				path, err := filepath.Rel(tempPackDir, compiledFile)
-				if (err != nil) {
-					fmt.Println("There is a weird error that Tesserpack couldn't explain...")
-					return
-				}
+		if (err != nil) {
+			fmt.Printf("Weird... It seems file \"%v\" was ignored.\n", compiledFile)
+			return nil
+		}
 
-				fmt.Printf("Weird... It seems file \"%v\" was ignored.\n", path)
-				return 
-			}
+		shardedCompiledFiles.Set(compiledFile, info)
 
-			shardedCompiledFiles.Set(compiledFile, info)
-			waitGroup.Done()
-		}(compiledFile)
-	}
-	waitGroup.Wait()
+		return nil
+	})
+
+	if (err != nil) {return err}
 
 	// turn it into a normal map
 	compiledFiles := map[string]os.FileInfo{}

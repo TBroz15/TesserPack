@@ -27,7 +27,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.24.2'   # change to your Go version
+          go-version: '1.25.0'   # change to your Go version
 
       - name: Install MSYS2 and MinGW
         uses: msys2/setup-msys2@v2
@@ -75,3 +75,4 @@ jobs:
           CGO_CFLAGS: "-I${{ github.workspace }}\\vips-dev-8.17\\include -I${{ github.workspace }}\\vips-dev-8.17\\include\\glib-2.0 -I${{ github.workspace }}\\vips-dev-8.17\\lib\\glib-2.0\\include -ID:\\a\\_temp\\msys64\\mingw64\\include -ID:\\a\\_temp\\msys64\\mingw64\\include\\glib-2.0 -ID:\\a\\_temp\\msys64\\mingw64\\lib\\glib-2.0\\include"
           CGO_LDFLAGS: "-L${{ github.workspace }}\\vips-dev-8.17\\lib -LD:\\a\\_temp\\msys64\\mingw64\\lib"
           PKG_CONFIG_PATH: "${{ github.workspace }}\\vips-dev-8.17\\lib\\pkgconfig"
+          GOEXPERIMENT: "jsonv2"

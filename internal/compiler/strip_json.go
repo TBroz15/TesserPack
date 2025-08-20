@@ -11,6 +11,8 @@ import (
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/types"
 
+	stableJSON "encoding/json/v2"
+
 	"github.com/goccy/go-json"
 
 	"github.com/tidwall/jsonc"
@@ -52,7 +54,7 @@ func StripJSON(srcFile string, outFile string, waitGroup *sync.WaitGroup, conf *
 		var result interface{}
 		err1 := json5.Unmarshal(fileContent, &result)
 
-		out1, err2 := json.Marshal(result)
+		out1, err2 := stableJSON.Marshal(result)
 		out = out1
 
 		err = errors.Join(err1, err2)
