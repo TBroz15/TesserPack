@@ -1,6 +1,6 @@
 module tesserpack
 
-go 1.24.2
+go 1.25
 
 require (
 	github.com/charlievieth/fastwalk v1.0.12
