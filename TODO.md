@@ -10,5 +10,6 @@
 - [ ] Regolith Integration
 - [ ] ARM64 Support
 - [ ] Do some optimizations (ive learnt a lesson to not optimize until all the program features is ready)
+- [ ] Fix some memory leaks (likely related to JSON & LANG stripping)
 - [ ] Proper Linux Support? (libvips is the problem)
 - [ ] TesserPack as Go package
