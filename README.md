@@ -106,9 +106,9 @@ TesserPack is a rewritten Golang port and the successor of [SuitcaseJS](https://
     - Can run multiple instances [^5]
     - Recompile already compiled packs (zip/mcpack)
     - [^2]
+- JSON5 support
 - User-friendly GUI (coming soon)
-- JSON5 support (also coming soon)
-- JS & TS minification (also also coming soon)
+- JS & TS minification (also coming soon)
 
 [^1]: Comparison of the uncompiled & unzipped pack to an optimized & zipped pack.
 [^2]: That's because it isn't written in Javascript. 
