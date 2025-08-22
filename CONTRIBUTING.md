@@ -12,11 +12,13 @@ TesserPack is kinda bare bones right now. PR contributions and how to develop on
 - If your bug report is related to pack compilation, please upload and include your pack into your issue for better reproduction.
 - TesserPack's intention was to optimize Minecraft packs for production. So make sure to stay on topic!
 
-## Windows Setup (for development & PR)
+## Development (PR)
+
+### Windows Setup
 
 > [!NOTE]
 > Windows Defender and other anti-viruses tend to slow down the compilation process,
-> since TesserPack isn't a well recognized program and think it's a sus program. (we are not sus ඞ)
+> since TesserPack isn't a well recognized program and think it's a suspicious program. (we are not sus ඞ)
 >
 > There are 3 solutions to this, 
 > 1. Add Go's binaries and TesserPack binary to Windows Defender exclusions.
@@ -25,21 +27,118 @@ TesserPack is kinda bare bones right now. PR contributions and how to develop on
 >
 > [For more information...](https://go.dev/doc/faq#virus)
 
-0.  Preparations
-    1. [Download and install Go](https://go.dev/dl/) `<=` 1.25 if you haven't. Read the [guide](https://go.dev/doc/tutorial/getting-started#prerequisites).
-    2. [Download Libvips](https://github.com/libvips/build-win64-mxe/releases/download/v8.17.1/vips-dev-w64-web-8.17.1.zip) and extract it.
-    3. Go to the extracted directory and put `vips-dev-8.17` into `C:\`.
-    4. Add Environmental Variables in Powershell. (you don't need epic admin powers btw...)
-        ```powershell
-        # Adds libvips to PATH
-        [Environment]::SetEnvironmentVariable("Path", "$([Environment]::GetEnvironmentVariable("Path", "User"));C:\vips-dev-8.17\bin", "User")
+1. [Download and install Go](https://go.dev/dl/) `<=` 1.25 if you haven't. Read the [guide](https://go.dev/doc/tutorial/getting-started#prerequisites) if you also haven't.
+2. [Download Libvips](https://github.com/libvips/build-win64-mxe/releases/download/v8.17.1/vips-dev-w64-web-8.17.1.zip) and extract it.
+3. Go to the extracted directory and put `vips-dev-8.17` into `C:\`.
+4. Add Environmental Variables in Powershell. (you don't need epic admin powers btw...)
+    ```powershell
+    # Adds libvips to PATH
+    [Environment]::SetEnvironmentVariable("Path", "$([Environment]::GetEnvironmentVariable("Path", "User"));C:\vips-dev-8.17\bin", "User")
 
-        # Add libvips's pkgconfig dir to PKG_CONFIG_PATH, so govips will recognize it.
-        [Environment]::SetEnvironmentVariable("PKG_CONFIG_PATH", "$([Environment]::GetEnvironmentVariable("PKG_CONFIG_PATH", "User"));C:\vips-dev-8.17\lib\pkgconfig", "User")
-        
-        # Set jsonv2 to GOEXPERIMENT, so TesserPack can use encoding/json/v2
-        [Environment]::SetEnvironmentVariable("GOEXPERIMENT", "jsonv2", "User")
-        ```
+    # Add libvips's pkgconfig dir to PKG_CONFIG_PATH, so govips will recognize it.
+    [Environment]::SetEnvironmentVariable("PKG_CONFIG_PATH", "$([Environment]::GetEnvironmentVariable("PKG_CONFIG_PATH", "User"));C:\vips-dev-8.17\lib\pkgconfig", "User")
+    
+    # Set jsonv2 to GOEXPERIMENT, so TesserPack can use encoding/json/v2
+    [Environment]::SetEnvironmentVariable("GOEXPERIMENT", "jsonv2", "User")
+    ```
+
+### Linux Setup
+
+#### Fedora 42+
+
+1. [Download and install Go](https://go.dev/dl/) `<=` 1.25 if you haven't. Read the [guide](https://go.dev/doc/tutorial/getting-started#prerequisites) if you also haven't.
+
+2. Uninstall Fedora's Libvips (Optional)
+    ```bash
+    sudo dnf remove vips vips-devel
+    ```
+
+3. Install Build Dependencies
+    ```bash
+    sudo dnf group install "development-tools"
+
+    sudo dnf install meson ninja-build pkg-config gcc gcc-c++ \
+        glib2-devel expat-devel libjpeg-turbo-devel libpng-devel \
+        libwebp-devel libtiff-devel giflib-devel lcms2-devel \
+        orc-devel poppler-glib-devel librsvg2-devel \
+        ImageMagick-c++-devel libheif-devel libexif-devel
+    ```
+
+4. Download Libvips
+    ```bash
+    wget https://github.com/libvips/libvips/releases/download/v8.17.1/vips-8.17.1.tar.xz
+    tar -xf vips-8.17.1.tar.xz
+    cd vips-8.17.1
+    ```
+
+5. Setup & Install
+    ```bash
+    meson setup builddir --prefix=/usr/local
+    cd builddir
+    ninja
+    sudo ninja install
+    sudo ldconfig
+    ```
+
+6. Verify if Libvips was installed
+    ```bash
+    vips --version
+    ```
+
+7. Set GOEXPERIMENT to jsonv2
+    ```bash
+    export GOEXPERIMENT=jsonv2
+    ```
+    You could add this into `.bashrc` or any shell configuration file.
+
+#### Ubuntu 22+
+
+1. [Download and install Go](https://go.dev/dl/) `<=` 1.25 if you haven't. Read the [guide](https://go.dev/doc/tutorial/getting-started#prerequisites) if you also haven't.
+
+2. Uninstall Ubuntu's Libvips (Optional)
+    ```bash
+    sudo apt remove libvips libvips-dev
+    ```
+
+3. Install Build Dependencies
+    ```bash
+    sudo apt update
+    
+    sudo apt install -y build-essential meson ninja-build pkg-config \
+        libglib2.0-dev libexpat1-dev libjpeg-turbo8-dev libpng-dev \
+        libwebp-dev libtiff-dev libgif-dev liblcms2-dev liborc-0.4-dev \
+        librsvg2-dev libheif-dev libexif-dev libpoppler-glib-dev \
+        libimagequant-dev
+    ```
+
+4. Download Libvips
+    ```bash
+    wget https://github.com/libvips/libvips/releases/download/v8.17.1/vips-8.17.1.tar.xz
+    tar -xf vips-8.17.1.tar.xz
+    cd vips-8.17.1
+    ```
+
+5. Setup & Install
+    ```bash
+    meson setup builddir --prefix=/usr/local
+    cd builddir
+    ninja
+    sudo ninja install
+    sudo ldconfig
+    ```
+
+6. Verify if Libvips was installed
+    ```bash
+    vips --version
+    ```
+
+7. Set GOEXPERIMENT to jsonv2
+    ```bash
+    export GOEXPERIMENT=jsonv2
+    ```
+    You could add this into `.bashrc` or any shell configuration file.
+
+### Steps
 
 1. Fork this repository
 2. In your repository, create a new branch with any name.
@@ -50,6 +149,3 @@ TesserPack is kinda bare bones right now. PR contributions and how to develop on
 7. Run `git commit` if you are done with your changes, like the usual.
 8. Push your branch to GitHub via `git push origin (your branch name)`
 9. Finally send your pull request to main. _It is recommended to draft your PR first if you are not sure with your code._
-
-
-##
