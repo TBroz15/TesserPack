@@ -12,7 +12,7 @@ import (
 // I tried it with a simple go func() and wait group, but my PC will crap itself
 // we're going to leave it synchronized first - tuxebro, 2025
 
-func CompressPNG(srcFile string, outFile string, PNGFile string,) {
+func CompressPNG(srcFile string, outFile string, PNGFile string) {
 	img, err := vips.NewPngload(srcFile, nil)
 	if err != nil {
 		fmt.Printf("Error Reading \"%v\", copying the image instead: %v\n", srcFile, err)
@@ -23,6 +23,7 @@ func CompressPNG(srcFile string, outFile string, PNGFile string,) {
 		return
 	}
 	defer img.Close()
+
 
 	buf, err := img.PngsaveBuffer(&vips.PngsaveBufferOptions{
 		Compression: 9,
