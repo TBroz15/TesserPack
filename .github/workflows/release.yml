@@ -1,4 +1,4 @@
-name: release-windows
+name: release
 
 on:
   push:
@@ -8,11 +8,11 @@ on:
 # omg i wasted a day and 4 hourse for this
 # -tuxebro, 2025
 jobs:
-  build-and-test:
+  build:
     name: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows]
+        os: [windows, ubuntu]
     runs-on: ${{ matrix.os }}-latest
     permissions:
       contents: write
@@ -29,7 +29,8 @@ jobs:
         with:
           go-version: '1.25.0'   # change to your Go version
 
-      - name: Install MSYS2 and MinGW
+      - name: Install MSYS2 and MinGW (Windows)
+        if: runner.os == 'Windows'    
         uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -38,19 +39,43 @@ jobs:
             mingw-w64-x86_64-pkg-config
             mingw-w64-x86_64-libvips
       
+      - name: Install Build Dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt install -y build-essential meson ninja-build pkg-config \
+            libglib2.0-dev libexpat1-dev libjpeg-turbo8-dev libpng-dev \
+            libwebp-dev libtiff-dev libgif-dev liblcms2-dev liborc-0.4-dev \
+            librsvg2-dev libheif-dev libexif-dev libpoppler-glib-dev \
+            libimagequant-dev
+
+      - name: Download and Install Libvips (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          wget https://github.com/libvips/libvips/releases/download/v8.17.1/vips-8.17.1.tar.xz
+            tar -xf vips-8.17.1.tar.xz
+            cd vips-8.17.1
+            meson setup builddir --prefix=/usr/local
+            cd builddir
+            ninja
+            sudo ninja install
+            sudo ldconfig
+      
       # help me, it took me more than 10 hours, trying to fix libvips and vips-gen omg why windows even exist
       # -tuxebro, 2025
-      - name: Are you sure? LIBVIPS! WHERE'S LIBVIPS? I NEED YOU LIBVIPS!!! Pretty sure. I am viping it, I am libviping it so good! WHERE IS HE???
+      - name: Are you sure? LIBVIPS! WHERE'S LIBVIPS? I NEED YOU LIBVIPS!!! Pretty sure. I am viping it, I am libviping it so good! WHERE IS HE??? (Windows)
+        if: runner.os == 'Windows'    
         run: pkg-config --libs --cflags vips
         shell: msys2 {0}
 
-      - name: Fetch libvips
+      - name: Fetch libvips (Windows)
+        if: runner.os == 'Windows'
         run: |
           curl -L -o vips.zip https://github.com/libvips/build-win64-mxe/releases/download/v8.17.1/vips-dev-w64-web-8.17.1.zip
           tar -xf vips.zip
         shell: cmd
 
-      - name: Copy Libvips DLLs
+      - name: Copy Libvips DLLs (Windows)
+        if: runner.os == 'Windows'
         run: |
           Get-ChildItem -Path "${{ github.workspace }}\\vips-dev-8.17\\bin" -Filter "*.dll" -Recurse | Move-Item -Destination "${{ github.workspace }}"
         shell: powershell
@@ -62,7 +87,8 @@ jobs:
       # here you go, you could take some inspirations from me.
       #
       # -tuxebro, 2025 from few hours ago
-      - name: Run GoReleaser
+      - name: Run GoReleaser (Windows)
+        if: runner.os == 'Windows'
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
@@ -75,4 +101,17 @@ jobs:
           CGO_CFLAGS: "-I${{ github.workspace }}\\vips-dev-8.17\\include -I${{ github.workspace }}\\vips-dev-8.17\\include\\glib-2.0 -I${{ github.workspace }}\\vips-dev-8.17\\lib\\glib-2.0\\include -ID:\\a\\_temp\\msys64\\mingw64\\include -ID:\\a\\_temp\\msys64\\mingw64\\include\\glib-2.0 -ID:\\a\\_temp\\msys64\\mingw64\\lib\\glib-2.0\\include"
           CGO_LDFLAGS: "-L${{ github.workspace }}\\vips-dev-8.17\\lib -LD:\\a\\_temp\\msys64\\mingw64\\lib"
           PKG_CONFIG_PATH: "${{ github.workspace }}\\vips-dev-8.17\\lib\\pkgconfig"
+          GOEXPERIMENT: "jsonv2"
+
+      - name: Run GoReleaser (Linux)
+        if: runner.os == 'Linux'
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          # 'latest', 'nightly', or a semver
+          version: "latest"
+          args: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CGO_ENABLED: 1
           GOEXPERIMENT: "jsonv2"

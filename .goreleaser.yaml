@@ -6,6 +6,7 @@ builds:
   - main: ./cmd/tesserpack         # change to your main package path
     binary: tesserpack
     goos:
+      - linux
       - windows
     goarch:
       - amd64
