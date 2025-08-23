@@ -33,6 +33,7 @@ changelog:
       - "^style:"
       - "^refactor:"
       - "^chore:"
+      - "^ci:"
 
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.linux.txt"
