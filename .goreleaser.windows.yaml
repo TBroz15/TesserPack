@@ -40,6 +40,9 @@ changelog:
       - "^refactor:"
       - "^chore:"
 
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.windows.txt"
+
 release:
   footer: >-
 
