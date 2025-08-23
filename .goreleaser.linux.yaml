@@ -9,7 +9,7 @@ builds:
       - linux
     goarch:
       - amd64
-    ldflags: -s -w -r $ORIGIN
+    ldflags: -s -w -r $ORIGIN/lib
 
 archives:
   - formats: [tar.gz]
