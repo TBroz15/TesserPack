@@ -42,6 +42,8 @@ jobs:
       - name: Install Build Dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
+          sudo apt update
+
           sudo apt install -y build-essential meson ninja-build pkg-config \
             libglib2.0-dev libexpat1-dev libjpeg-turbo8-dev libpng-dev \
             libwebp-dev libtiff-dev libgif-dev liblcms2-dev liborc-0.4-dev \
