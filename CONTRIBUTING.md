@@ -165,6 +165,6 @@ These setups are relatively similar for every other distributions that are not i
 4. Run `go get -u ./...` to install the required dependencies.
 5. Make some changes for your PR.
 6. Run `go run ./cmd/tesserpack` or `go build ./cmd/tesserpack` then run `./tesserpack` to test it out.
-7. Run `git commit` if you are done with your changes, like the usual.
+7. Run `git commit` if you are done with your changes, like the usual. [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) are followed.
 8. Push your branch to GitHub via `git push origin (your branch name)`
 9. Finally send your pull request to main. _It is recommended to draft your PR first if you are not sure with your code._
