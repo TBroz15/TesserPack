@@ -94,7 +94,7 @@ jobs:
       - name: Copy Libvips Shared Objects (Linux)
         if: runner.os == 'Linux'
         run: |
-          mkdir -p dist/lib
+          mkdir -p ./lib/
           sudo cp /usr/local/lib/x86_64-linux-gnu/libvips*.so* ./lib/
 
       - name: Run GoReleaser (Windows)
