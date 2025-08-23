@@ -124,5 +124,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CGO_ENABLED: 1
-          CGO_LDFLAGS: "-Wl,-rpath,\\$ORIGIN"
           GOEXPERIMENT: "jsonv2"
