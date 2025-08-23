@@ -33,4 +33,4 @@ vips-8.17.1/
 # Added by goreleaser init:
 dist/
 
-lib
+lib/
