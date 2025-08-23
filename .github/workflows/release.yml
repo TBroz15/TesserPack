@@ -1,3 +1,11 @@
+# dear tuxebro from the past, after hours of breaking bones
+# i finally found the answer
+# 
+# dear code reader, if you are wondering how to integrate vipsgen with Github Actions, Goreleaser and what not
+# here you go, you could take some inspirations from me.
+#
+# -tuxebro, 2025
+
 name: release
 
 on:
@@ -5,6 +13,7 @@ on:
     tags:
       - 'v*'           # run on git tags like v1.2.3; adjust if you prefer manual dispatch
   workflow_dispatch:
+    
 # omg i wasted a day and 4 hourse for this
 # -tuxebro, 2025
 jobs:
@@ -82,13 +91,12 @@ jobs:
           Get-ChildItem -Path "${{ github.workspace }}\\vips-dev-8.17\\bin" -Filter "*.dll" -Recurse | Move-Item -Destination "${{ github.workspace }}"
         shell: powershell
 
-      # dear tuxebro from the past, after hours of breaking bones
-      # i finally found the answer
-      # 
-      # dear code reader, if you are wondering how to integrate vipsgen with Github Actions, Goreleaser and what not
-      # here you go, you could take some inspirations from me.
-      #
-      # -tuxebro, 2025 from few hours ago
+      - name: Copy Libvips Shared Objects (Linux)
+        if: runner.os == 'Linux'
+        run: 
+          mkdir -p dist/lib
+          cp /usr/local/lib/x86_64-linux-gnu/libvips*.so* dist/lib/
+
       - name: Run GoReleaser (Windows)
         if: runner.os == 'Windows'
         uses: goreleaser/goreleaser-action@v6
@@ -116,4 +124,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CGO_ENABLED: 1
+          CGO_LDFLAGS: "-Wl,-rpath,'$ORIGIN/lib'"
           GOEXPERIMENT: "jsonv2"
