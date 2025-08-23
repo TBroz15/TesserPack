@@ -2,9 +2,6 @@
 
 TesserPack is kinda bare bones right now. PR contributions and how to develop on TesserPack is not completely considered until v1 is being released. Feel free to report any issues!
 
-> [!WARNING]
-> **ALL SETUPS FOR DEVELOPMENT ARE NOT TESTED AND CONSIDERED!**
-
 ## Before Sending Issues...
 
 - Please check if your issue is already resolved, so your issue won't be closed as duplicate.
@@ -38,6 +35,8 @@ This guide will definitely help you save some time without countless trials and 
 5. In MSYS2, install some packages by `pacman -S --needed base-devel mingw-w64-ucrt-x86_64-toolchain`. Just press enter and then enter `Y` to install.
 6. Add Environmental Variables in Powershell and restart your terminal. (you don't need epic admin powers btw...)
     ```powershell
+    # Note: This will make the variables globally available on your every terminal.
+
     # Adds gcc to PATH
     [Environment]::SetEnvironmentVariable("Path", "$([Environment]::GetEnvironmentVariable("Path", "User"));C:\msys64\ucrt64\bin", "User")
 
@@ -56,9 +55,17 @@ This guide will definitely help you save some time without countless trials and 
 
 ### Linux Setup
 
+These setups are relatively similar for every other distributions that are not included here.
+
 #### Fedora 42+
 
-1. [Download and install Go](https://go.dev/dl/) `<=` 1.25 if you haven't. Read the [guide](https://go.dev/doc/tutorial/getting-started#prerequisites) if you also haven't.
+1. [Download Go](https://go.dev/dl/) `<=` 1.25 and [install](https://go.dev/doc/install#install) it if you haven't. Read the [guide](https://go.dev/doc/tutorial/getting-started#prerequisites) if you also haven't.
+
+    *Not recommended* but alternatively, you can install the latest version of Go from Rawhide.
+    ```bash
+    sudo dnf install fedora-repos-rawhide
+    sudo dnf install golang --enablerepo=rawhide
+    ```
 
 2. Uninstall Fedora's Libvips (Optional)
     ```bash
@@ -85,7 +92,7 @@ This guide will definitely help you save some time without countless trials and 
 
 5. Setup & Install
     ```bash
-    meson setup builddir --prefix=/usr/local
+    meson setup builddir --prefix=/usr
     cd builddir
     ninja
     sudo ninja install
@@ -103,9 +110,9 @@ This guide will definitely help you save some time without countless trials and 
     ```
     You could add this into `.bashrc` or any shell configuration file.
 
-#### Ubuntu 22+
+#### Ubuntu 24+
 
-1. [Download and install Go](https://go.dev/dl/) `<=` 1.25 if you haven't. Read the [guide](https://go.dev/doc/tutorial/getting-started#prerequisites) if you also haven't.
+1. [Download Go](https://go.dev/dl/) `<=` 1.25 and [install](https://go.dev/doc/install#install) it if you haven't. Read the [guide](https://go.dev/doc/tutorial/getting-started#prerequisites) if you also haven't.
 
 2. Uninstall Ubuntu's Libvips (Optional)
     ```bash
@@ -150,7 +157,7 @@ This guide will definitely help you save some time without countless trials and 
     ```
     You could add this into `.bashrc` or any shell configuration file.
 
-### Steps
+### After Setup, Steps:
 
 1. Fork this repository
 2. In your repository, create a new branch with any name.
