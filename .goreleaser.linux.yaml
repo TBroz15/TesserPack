@@ -21,7 +21,7 @@ archives:
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
     files:
-      - "./lib/*" 
+      - "lib/*" 
       - "README.md"
       - "LICENSE"
 
