@@ -1,0 +1,42 @@
+version: 2
+
+project_name: tesserpack
+
+builds:
+  - main: ./cmd/tesserpack         # change to your main package path
+    binary: tesserpack
+    goos:
+      - linux
+    goarch:
+      - amd64
+    ldflags: -s -w
+
+archives:
+  - formats: [tar.gz]
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    files:
+      - "README.md"
+      - "LICENSE"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^style:"
+      - "^refactor:"
+      - "^chore:"
+
+release:
+  footer: >-
+
+    ---
+
+    Released by [GoReleaser](https://github.com/goreleaser/goreleaser).

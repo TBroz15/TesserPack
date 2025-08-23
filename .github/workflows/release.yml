@@ -96,7 +96,7 @@ jobs:
           distribution: goreleaser
           # 'latest', 'nightly', or a semver
           version: "latest"
-          args: release
+          args: release --config .goreleaser.windows.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CGO_ENABLED: 1
@@ -112,7 +112,7 @@ jobs:
           distribution: goreleaser
           # 'latest', 'nightly', or a semver
           version: "latest"
-          args: release
+          args: release --config .goreleaser.linux.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CGO_ENABLED: 1
