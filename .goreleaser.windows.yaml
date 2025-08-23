@@ -45,6 +45,7 @@ checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.windows.txt"
 
 release:
+  name_template: "{{ .Summary }} - {{ .Version }}"
   footer: >-
 
     ---
