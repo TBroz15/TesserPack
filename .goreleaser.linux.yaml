@@ -9,9 +9,7 @@ builds:
       - linux
     goarch:
       - amd64
-    ldflags: -s -w
-    env:
-      - CGO_LDFLAGS="-Wl,-rpath,\$ORIGIN"
+    ldflags: -s -w -r $ORIGIN
 
 archives:
   - formats: [tar.gz]
