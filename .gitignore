@@ -27,5 +27,8 @@ go.work.sum
 # dont include libvips
 vips.zip
 vips-dev-8.17/
+vips-8.17.1.tar.xz
+vips-8.17.1/
+
 # Added by goreleaser init:
 dist/
