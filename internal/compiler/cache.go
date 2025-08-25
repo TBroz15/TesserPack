@@ -37,5 +37,13 @@ func Cached(
 
 	processedData, err := processor(fileContent)
 
-	cache.NewFile(hashFile, )
+	cache.NewFile(hashFile, processedData)
+
+	cacheExist, err = cache.CopyIfExists(hashFile, outFile) 
+	if err != nil {
+		fmt.Printf("Error Reading Cache of \"%v\": %v\n", srcFile, err)
+		return
+	}
+
+	
 }
