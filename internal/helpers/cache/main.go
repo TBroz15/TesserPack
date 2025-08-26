@@ -29,20 +29,11 @@ func GetHashFile(data *[]byte, ext string) (string) {
 }
 
 func CopyIfExists(hashFile string, outFile string) (cacheExist bool, err error) {
-	_, err = os.Stat(hashFile)
-	if (os.IsNotExist(err)) {
-		return false, nil
-	}
-
-	// if stat error is different
+	err = helpers.LinkOrCopy(hashFile, outFile)
 	if (err != nil) {
 		return false, err
 	}
 
-	err = helpers.LinkOrCopy(hashFile, outFile)
-	if (err != nil) {
-		return true, err
-	}
 
 	return true, nil
 }
