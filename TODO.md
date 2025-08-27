@@ -10,10 +10,11 @@
 - [ ] Proper error checking
 - [ ] Fix some memory leaks (likely related to JSON & LANG stripping)
 - [ ] Worker pool? (might fix memleaks)
+- [ ] v0 GUI w/ wails
 
 ### After v1.0
 
-- [ ] GUI w/ wails (so people wont just type in their terminal to look like some sort of hacker) (TBD by v1.0)
+- [ ] v1 GUI (when TesserPack-GUI is considered to be complete)
 - [ ] Multithread assets processing
 - [ ] Minify JS & TS through ESBuild (TBD by v1.1)
 - [ ] Graceful Shutdown
