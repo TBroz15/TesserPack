@@ -11,6 +11,7 @@ import (
 	"path"
 	"path/filepath"
 	"tesserpack/internal/helpers"
+	"tesserpack/internal/helpers/cache"
 	"tesserpack/internal/types"
 
 	"github.com/charlievieth/fastwalk"
@@ -105,7 +106,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		srcFile := path.Join(inPath, PNGFile)
 		outFile := path.Join(tempPackDir, PNGFile)
 
-		CompressPNG(srcFile, outFile, PNGFile)
+		Cached(srcFile, outFile, ".png", CompressPNG, nil)
 	}
 
 	fmt.Println("Finished optimizing PNG files.")
@@ -114,7 +115,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		srcFile := path.Join(inPath, JPGFile)
 		outFile := path.Join(tempPackDir, JPGFile)
 
-		CompressJPG(srcFile, outFile, JPGFile)
+		Cached(srcFile, outFile, ".jpg", CompressJPG, nil)
 	}
 
 	fmt.Println("Finished optimizing JPEG files.")
@@ -162,6 +163,8 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 
 	fmt.Printf("Successfully optimized \"%v\"\n", filepath.Base(originalInPath))
 	fmt.Printf("Optimized pack is located at \"%v\"\n", outPath)
+
+	cache.SaveCacheList()
 
 	return nil
 }

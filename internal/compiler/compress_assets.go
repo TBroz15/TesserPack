@@ -12,15 +12,10 @@ import (
 // I tried it with a simple go func() and wait group, but my PC will crap itself
 // we're going to leave it synchronized first - tuxebro, 2025
 
-func CompressPNG(srcFile string, outFile string, PNGFile string) {
-	img, err := vips.NewPngload(srcFile, nil)
+func CompressPNG(data *[]byte, outFile string, srcFile string) (processedData []byte, err error) {
+	img, err := vips.NewPngloadBuffer(*data, nil)
 	if err != nil {
-		fmt.Printf("Error Reading \"%v\", copying the image instead: %v\n", srcFile, err)
-
-		err := helpers.LinkOrCopy(srcFile, outFile)		
-		if (err != nil) {fmt.Printf("Error Copying \"%v\": %v\n", srcFile, err)}
-
-		return
+		return nil, err
 	}
 	defer img.Close()
 
@@ -32,8 +27,7 @@ func CompressPNG(srcFile string, outFile string, PNGFile string) {
 	})
 
 	if err != nil {
-		fmt.Printf("Error Saving Buffer \"%v\": %v\n", srcFile, err)
-		return
+		return nil, err
 	}
 
 	info, err := os.Stat(srcFile)
@@ -46,41 +40,28 @@ func CompressPNG(srcFile string, outFile string, PNGFile string) {
 
 	// copy the original image if "optimized" image has bigger has file size
 	if (len(buf) > size) {
-		err := helpers.LinkOrCopy(srcFile, outFile)
-			
-		if (err != nil) {fmt.Printf("Error Copying \"%v\": %v\n", srcFile, err)}
-		return
+		return nil, helpers.LinkOrCopy(srcFile, outFile)			
 	}
 
-	// Save resulting bytes to disk
-	err = os.WriteFile(outFile, buf, 0644)
-	if err != nil {
-		fmt.Printf("Error Writing PNG \"%v\": %v\n", srcFile, err)
-		return
-	}
-
+	return buf, nil
 }
 
-func CompressJPG(srcFile string, outFile string, JPGFile string) {
-	img, err := vips.NewJpegload(srcFile, nil)
+func CompressJPG(data *[]byte, outFile string, srcFile string) (processedData []byte, err error) {
+	img, err := vips.NewJpegloadBuffer(*data, nil)
 	if err != nil {
-		fmt.Printf("Error Reading \"%v\", copying the image instead: %v\n", srcFile, err)
-
-		err := helpers.LinkOrCopy(srcFile, outFile)		
-		if (err != nil) {fmt.Printf("Error Copying \"%v\": %v\n", srcFile, err)}
-
-		return
+		return nil, err
 	}
 	defer img.Close()
 
+
 	buf, err := img.JpegsaveBuffer(&vips.JpegsaveBufferOptions{
-		OptimizeCoding: true,
 		Interlace: false,
+		OptimizeCoding: true,
+		OptimizeScans: true,
 	})
 
 	if err != nil {
-		fmt.Printf("Error Saving Buffer \"%v\": %v\n", srcFile, err)
-		return
+		return nil, err
 	}
 
 	info, err := os.Stat(srcFile)
@@ -93,17 +74,8 @@ func CompressJPG(srcFile string, outFile string, JPGFile string) {
 
 	// copy the original image if "optimized" image has bigger has file size
 	if (len(buf) > size) {
-		err := helpers.LinkOrCopy(srcFile, outFile)
-		
-		if (err != nil) {fmt.Printf("Error Copying \"%v\": %v\n", srcFile, err)}
-		return
+		return nil, helpers.LinkOrCopy(srcFile, outFile)			
 	}
 
-	// Save resulting bytes to disk
-	err = os.WriteFile(outFile, buf, 0644)
-	if err != nil {
-		fmt.Printf("Error Writing JPG \"%v\": %v\n", srcFile, err)
-		return
-	}
-
+	return buf, nil
 }

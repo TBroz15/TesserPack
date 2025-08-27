@@ -7,7 +7,11 @@ import (
 	"log"
 	"os"
 	"path"
+	"sync"
 	"tesserpack/internal/helpers"
+
+	"github.com/goccy/go-json"
+	"github.com/phuslu/shardmap"
 )
 
 var CacheDir = func () (string) {
@@ -21,24 +25,90 @@ var CacheDir = func () (string) {
 	return cacheDir
 }()
 
+var cacheListFile = path.Join(CacheDir, ".cache_list")
+
+// TODO: make it a bit more modular with interfaces
+
+// just realized that golang does not provide sets -tuxebro
+var cacheLockList = func () (*shardmap.Map[string, *sync.Mutex]) {
+	cacheListData, err := os.ReadFile(cacheListFile)
+	if os.IsNotExist(err) {
+		return shardmap.New[string, *sync.Mutex](0)
+	}
+
+	if (err != nil) {
+		log.Fatalln(fmt.Errorf("%s. please give me home directory perms pwease",err.Error()))
+	}
+
+	cacheListArray := []string{} // "umm acksually its called a schlice"
+	err = json.Unmarshal(cacheListData, &cacheListArray)
+	if (err != nil) {
+		return shardmap.New[string, *sync.Mutex](0)
+	}
+
+	cacheList := shardmap.New[string, *sync.Mutex](len(cacheListArray)) // use threadsafe shardmaps since compilation is multithreaded
+	for _, v := range cacheListArray {
+		cacheList.Set(v, &sync.Mutex{})
+	}
+	cacheListArray = nil
+
+	return cacheList
+}()
+
+// Run this after successful compilation
+func SaveCacheList() {
+	cacheListArray := make([]string, 0, cacheLockList.Len())
+	cacheLockList.Range(func(key string, _ *sync.Mutex) bool {
+		cacheListArray = append(cacheListArray, key)
+		return true
+	})
+	cacheLockList.Clear()
+
+	cacheListData, err := json.Marshal(cacheListArray)
+	if (err != nil) {
+		log.Println("Failed to save Cache List.")
+	}
+
+	err = os.WriteFile(cacheListFile, cacheListData, 0777)
+	if (err != nil) {
+		log.Println("Failed to save Cache List.")
+	}
+}
+
 func GetHashFile(data *[]byte, ext string) (string) {
 	hash 	:= md5.Sum(*data)
 	hexHash := hex.EncodeToString(hash[:])
 
-	return path.Join(CacheDir, hexHash+ext)
+	return hexHash + ext
 }
 
-func CopyIfExists(hashFile string, outFile string) (cacheExist bool, err error) {
-	err = helpers.LinkOrCopy(hashFile, outFile)
+func TryCopyCache(hashFile string, outFile string) (cacheExists bool, err error) {	
+	cacheLock, cacheExists := cacheLockList.Get(hashFile)
+	if (!cacheExists) {
+		return false, nil
+	}
+	cacheLock.Lock()
+	defer cacheLock.Unlock()
+
+	err = helpers.LinkOrCopy(path.Join(CacheDir, hashFile), outFile)
 	if (err != nil) {
 		return false, err
 	}
 
-
 	return true, nil
 }
 
-func NewFile(hashFile string, processedData []byte) error {
-	err := os.WriteFile(hashFile, processedData, 0700)
+func SaveCache(hashFile string, processedData []byte) error {
+	cacheLock, cacheExists := cacheLockList.Get(hashFile)
+	if (!cacheExists) {
+		cacheLockList.Set(hashFile, &sync.Mutex{})
+		cacheLock1, _ := cacheLockList.Get(hashFile)
+		cacheLock = cacheLock1
+		cacheExists = true
+	}
+	cacheLock.Lock()
+	defer cacheLock.Unlock()
+
+	err := os.WriteFile(path.Join(CacheDir, hashFile), processedData, 0777)
 	return err
 }
