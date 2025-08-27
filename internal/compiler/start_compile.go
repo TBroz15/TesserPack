@@ -72,7 +72,7 @@ func StartCompile(conf *types.Config) error {
 	tempUnzippedPackDir, err := helpers.MkTempPackDir(inPathBase+"-unzipped")
 	if (err != nil) {return err}
 
-	extractor, err := fastzip.NewExtractor(inPathAbs, tempUnzippedPackDir, fastzip.WithExtractorConcurrency(4))
+	extractor, err := fastzip.NewExtractor(inPathAbs, tempUnzippedPackDir)
 	if (err != nil) {return err}
 	defer extractor.Close()
 
