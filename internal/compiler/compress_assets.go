@@ -3,7 +3,9 @@ package compiler
 import (
 	"fmt"
 	"os"
+	"sync"
 	"tesserpack/internal/helpers"
+	"tesserpack/internal/types"
 
 	"github.com/cshum/vipsgen/vips"
 )
@@ -12,7 +14,7 @@ import (
 // I tried it with a simple go func() and wait group, but my PC will crap itself
 // we're going to leave it synchronized first - tuxebro, 2025
 
-func CompressPNG(data *[]byte, outFile string, srcFile string) (processedData []byte, err error) {
+func CompressPNG(data *[]byte, outFile *string, srcFile *string, conf *types.Config, _ *sync.WaitGroup) (processedData []byte, err error) {
 	img, err := vips.NewPngloadBuffer(*data, nil)
 	if err != nil {
 		return nil, err
@@ -30,7 +32,7 @@ func CompressPNG(data *[]byte, outFile string, srcFile string) (processedData []
 		return nil, err
 	}
 
-	info, err := os.Stat(srcFile)
+	info, err := os.Stat(*srcFile)
 	if err != nil {
 		fmt.Printf("Error Reading Info \"%v\": %v\n", srcFile, err)
 		return
@@ -40,13 +42,13 @@ func CompressPNG(data *[]byte, outFile string, srcFile string) (processedData []
 
 	// copy the original image if "optimized" image has bigger has file size
 	if (len(buf) > size) {
-		return nil, helpers.LinkOrCopy(srcFile, outFile)			
+		return nil, helpers.LinkOrCopy(*srcFile, *outFile)			
 	}
 
 	return buf, nil
 }
 
-func CompressJPG(data *[]byte, outFile string, srcFile string) (processedData []byte, err error) {
+func CompressJPG(data *[]byte, outFile *string, srcFile *string, conf *types.Config, _ *sync.WaitGroup) (processedData []byte, err error) {
 	img, err := vips.NewJpegloadBuffer(*data, nil)
 	if err != nil {
 		return nil, err
@@ -64,7 +66,7 @@ func CompressJPG(data *[]byte, outFile string, srcFile string) (processedData []
 		return nil, err
 	}
 
-	info, err := os.Stat(srcFile)
+	info, err := os.Stat(*srcFile)
 	if err != nil {
 		fmt.Printf("Error Reading Info \"%v\": %v\n", srcFile, err)
 		return
@@ -74,7 +76,7 @@ func CompressJPG(data *[]byte, outFile string, srcFile string) (processedData []
 
 	// copy the original image if "optimized" image has bigger has file size
 	if (len(buf) > size) {
-		return nil, helpers.LinkOrCopy(srcFile, outFile)			
+		return nil, helpers.LinkOrCopy(*srcFile, *outFile)			
 	}
 
 	return buf, nil

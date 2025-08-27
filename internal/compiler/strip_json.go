@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -19,25 +18,21 @@ import (
 	"github.com/titanous/json5"
 )
 
-func StripJSON(srcFile string, outFile string, waitGroup *sync.WaitGroup, conf *types.Config) {
-	defer waitGroup.Done()
-
-	fileContent, err := os.ReadFile(srcFile)
-	if err != nil {
-		fmt.Printf("Error Reading \"%v\": %v\n", srcFile, err)
-		return
+func StripJSON(data *[]byte, outFile *string, srcFile *string, conf *types.Config, waitGroup *sync.WaitGroup) (processedData []byte, err error) {
+	if (waitGroup != nil) {
+		defer waitGroup.Done()
 	}
 
-	helpers.RemoveBOM(&fileContent)
+	helpers.RemoveBOM(data)
 
-	jsonExt := filepath.Ext(srcFile)
-	outFile = strings.TrimSuffix(outFile, jsonExt) + ".json" // always output file as .json
+	jsonExt := filepath.Ext(*srcFile)
+	*outFile = strings.TrimSuffix(*outFile, jsonExt) + ".json" // always output file as .json
 	
 	var out []byte
 
 	switch {
 	case jsonExt == ".jsonc" || (jsonExt == ".json" && !conf.IsStrictJSON):
-		strippedComments := jsonc.ToJSONInPlace(fileContent)
+		strippedComments := jsonc.ToJSONInPlace(*data)
 		result := new(bytes.Buffer)
 		err = json.Compact(result, strippedComments)
 
@@ -45,14 +40,14 @@ func StripJSON(srcFile string, outFile string, waitGroup *sync.WaitGroup, conf *
 
 	case jsonExt == ".json":
 		result := new(bytes.Buffer)
-		err = json.Compact(result, fileContent)
+		err = json.Compact(result, *data)
 
 		out = result.Bytes()
 
 	case jsonExt == ".json5":
 		// wow what am i doing -tuxebro
 		var result interface{}
-		err1 := json5.Unmarshal(fileContent, &result)
+		err1 := json5.Unmarshal(*data, &result)
 
 		out1, err2 := stableJSON.Marshal(result)
 		out = out1
@@ -63,18 +58,14 @@ func StripJSON(srcFile string, outFile string, waitGroup *sync.WaitGroup, conf *
 	if err != nil {
 		fmt.Printf("Error Optimizing JSON \"%v\", copying the JSON instead: %v\n", srcFile, err)
 
-		err := helpers.LinkOrCopy(srcFile, outFile)		
+		err := helpers.LinkOrCopy(*srcFile, *outFile)		
 		if err != nil {
 			fmt.Printf("Error Copying \"%v\": %v\n", srcFile, err)
+			return nil, nil
 		}
 
-		return
+		return nil, err
 	}
 
-	err = os.WriteFile(outFile, out, os.ModePerm)
-
-	if err != nil {
-		fmt.Printf("Error Writing \"%v\": %v\n", outFile, err)
-		return
-	}
+	return out, err
 }

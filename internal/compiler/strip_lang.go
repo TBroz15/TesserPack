@@ -2,37 +2,34 @@ package compiler
 
 import (
 	"bytes"
-	"fmt"
-	"os"
 	"sync"
+	"tesserpack/internal/helpers"
+	"tesserpack/internal/types"
 )
 
-func StripLANG(srcFile string, outFile string, waitGroup *sync.WaitGroup) {
-	defer waitGroup.Done()
+// TODO: try to use string builder and see if it is more optimized
 
-	data, err := os.ReadFile(srcFile)
-	if err != nil {
-		fmt.Printf("Error Reading \"%v\": %v\n", srcFile, err)
-		return
+func StripLANG(data *[]byte, outFile *string, srcFile *string, _ *types.Config, waitGroup *sync.WaitGroup) (processedData []byte, err error) {
+	if waitGroup != nil {
+		defer waitGroup.Done()
 	}
 
-	// get rid of the nasty BOM thingabob
-	data = bytes.TrimPrefix(data, []byte("\xef\xbb\xbf"))
-	
+	helpers.RemoveBOM(data)
+
 	// uh oh, i use mr. gpt to optimize my code further in seconds
 	// so i can prevent premature optimizations
 	// i will try to explain what it does -TuxeBro
 
-	stripped := make([]byte, 0, len(data))
+	stripped := make([]byte, 0, len(*data))
 
 	start := 0
-	for i := 0; i <= len(data); i++ {
+	for i := 0; i <= len(*data); i++ {
 		// If not newline or EOF
-		if (!(i == len(data) || data[i] == '\n')) {
+		if (!(i == len(*data) || (*data)[i] == '\n')) {
 			continue
 		}
 
-		line := data[start:i]
+		line := (*data)[start:i]
 
 		// If \r\n, strip \r, because of Windows
 		if len(line) > 0 && line[len(line)-1] == '\r' {
@@ -60,10 +57,5 @@ func StripLANG(srcFile string, outFile string, waitGroup *sync.WaitGroup) {
 		stripped = stripped[:len(stripped)-1]
 	}
 
-	err = os.WriteFile(outFile, stripped, os.ModePerm)
-
-	if err != nil {
-		fmt.Printf("Error Writing \"%v\": %v\n", outFile, err)
-		return
-	}
+	return stripped, nil
 }

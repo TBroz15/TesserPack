@@ -5,13 +5,15 @@ import (
 	"os"
 	"sync"
 	"tesserpack/internal/helpers/cache"
+	"tesserpack/internal/types"
 )
 
 func Cached(
 	srcFile string,
 	outFile string,
-	ext string, 
-	processor func(data *[]byte, outFile string, srcFile string) (processedData []byte, err error),
+	ext string,
+	processor func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, waitGroup *sync.WaitGroup) (processedData []byte, err error),
+	conf *types.Config,
 	waitGroup *sync.WaitGroup) {
 
 	if (waitGroup != nil) {
@@ -34,7 +36,7 @@ func Cached(
 
 	if cacheExist {return}
 
-	processedData, err := processor(&fileContent, outFile, srcFile)
+	processedData, err := processor(&fileContent, &outFile, &srcFile, conf, nil)
 	if (err != nil) {
 		fmt.Printf("Error Processing \"%v\": %v", srcFile, err)
 		return
