@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/helpers/instancechecker"
 	"tesserpack/internal/types"
@@ -16,7 +15,6 @@ import (
 
 // Do some preparation before compilation
 func StartCompile(conf *types.Config) error {
-	waitGroup := sync.WaitGroup{}
     instanceChecker := instancechecker.New()
 	
 	inPathStat, err := os.Stat(conf.InPath)
@@ -63,7 +61,7 @@ func StartCompile(conf *types.Config) error {
 	if (inPathStat.IsDir()) {
 		Compile(inPathAbs, inPathAbs, outPathAbs, tempPackDir, conf)
 
-		os.RemoveAll(tempPackDir)
+		helpers.ClearTemp()
 		return nil
 	}
 
@@ -82,17 +80,6 @@ func StartCompile(conf *types.Config) error {
 
 	Compile(tempUnzippedPackDir, inPathAbs, outPathAbs, tempPackDir, conf)
 
-	dirsToClean := []string{tempPackDir,tempUnzippedPackDir}
-	for _, dir := range dirsToClean {
-		waitGroup.Add(1)
-		go func(path string) {
-			defer waitGroup.Done()
-			err := os.RemoveAll(path)
-			if err != nil {
-				fmt.Printf("Error removing %s: %v\n", path, err)
-			}
-		}(dir)
-	}
-	waitGroup.Wait()	
+	helpers.ClearTemp()
 	return nil
 }
