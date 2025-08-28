@@ -110,8 +110,8 @@ TesserPack is a rewritten Golang port and the successor of [SuitcaseJS](https://
 - User-friendly GUI (coming soon)
 - JS & TS minification (also coming soon)
 
-[^1]: Comparison of the uncompiled & unzipped pack to an optimized & zipped pack.
+[^1]: Comparison of the uncompiled & unzipped pack (~200MB) to an optimized & zipped pack (~100MB).
 [^2]: That's because it isn't written in Javascript. 
-[^3]: TesserPack was designed to handle large Minecraft packs like [bedrock-samples](https://github.com/Mojang/bedrock-samples) without some overhead. It had easier and proper multithreading than in SuitcaseJS, all thanks to Golang's Goroutines.
+[^3]: TesserPack was designed to handle large Minecraft packs like [bedrock-samples](https://github.com/Mojang/bedrock-samples) without some overhead.
 [^4]: I've found that SuitcaseJS is using ~1.2GB vs. TesserPack with ~100MB in their peak RAM usage when compiling [bedrock-samples](https://github.com/Mojang/bedrock-samples). dat so insane vro ☠️☠️☠️ -TuxeBro
 [^5]: Running multiple instances of SuitcaseJS will break since it works in a hard coded directory (*homedir*/.suitcase/temp) at the same time. TesserPack can have multiple instances but it will warn you since it can be resource intensive.
