@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"tesserpack/internal/helpers"
 	"tesserpack/internal/helpers/cache"
 	"tesserpack/internal/types"
 
@@ -47,7 +48,13 @@ func Cached(
 
 	processedData, err := processor(&fileContent, &outFile, &srcFile, conf, nil)
 	if (err != nil) {
-		log.Error("Failed to process file", "err", err, "file", baseFile)
+		log.Error("Failed to process file. Copying the original instead", "err", err, "file", baseFile)
+
+		err := helpers.LinkOrCopy(srcFile, outFile)		
+		if err != nil {
+			log.Error("Failed to copy file", "err", err, "file", baseFile)
+			return
+		}
 		return
 	}
 

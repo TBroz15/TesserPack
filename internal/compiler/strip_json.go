@@ -3,7 +3,6 @@ package compiler
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -56,14 +55,6 @@ func StripJSON(data *[]byte, outFile *string, srcFile *string, conf *types.Confi
 	}
 	
 	if err != nil {
-		fmt.Printf("Error Optimizing JSON \"%v\", copying the JSON instead: %v\n", srcFile, err)
-
-		err := helpers.LinkOrCopy(*srcFile, *outFile)		
-		if err != nil {
-			fmt.Printf("Error Copying \"%v\": %v\n", srcFile, err)
-			return nil, nil
-		}
-
 		return nil, err
 	}
 
