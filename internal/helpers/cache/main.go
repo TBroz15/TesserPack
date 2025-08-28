@@ -79,7 +79,7 @@ func GetHashFile(data *[]byte, ext string) (string) {
 	hash := xxhash.Sum64(*data)
 	size := len(*data)
 
-	return fmt.Sprintf("%x-%d", hash, size)
+	return fmt.Sprintf("%x-%d%v", hash, size, ext)
 }
 
 func TryCopyCache(hashFile string, outFile string) (cacheExists bool, err error) {	
