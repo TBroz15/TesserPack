@@ -5,7 +5,7 @@
 - [x] Implement main features (such as JSON, assets, and zip compression)
 - [x] JSON5 support (pack devs will like this)
 - [x] Proper Linux Support (libvips is the problem)
-- [ ] Caching
+- [x] Caching
 - [ ] Config
 - [ ] Proper error checking
 - [ ] Fix some memory leaks (likely related to JSON & LANG stripping)
