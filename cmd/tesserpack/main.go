@@ -4,14 +4,13 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"os"
 
 	"tesserpack/internal/compiler"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/types"
 
+	"github.com/charmbracelet/log"
 	"github.com/urfave/cli/v3"
 )
 
@@ -67,10 +66,12 @@ func main() {
 			Aliases: []string{"ct"},
 			Usage:   "Clears all temporary directories.\nJust in case if TesserPack fails on compilation and hasn't deleted the temporary files.",
 			Action: func(ctx context.Context, c *cli.Command) error {
-				fmt.Println("Clearing temporary directories...")
+				log.Info("Clearing temporary directories...")
 
 				err := helpers.ClearTemp()
 				if (err != nil) {return err}
+
+				log.Info("Successfully cleared temporary directories.")
 
 				return nil
 			},

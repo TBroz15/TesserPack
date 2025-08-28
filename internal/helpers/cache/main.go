@@ -2,14 +2,13 @@ package cache
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"sync"
 	"tesserpack/internal/helpers"
 
 	"github.com/cespare/xxhash"
-
+	"github.com/charmbracelet/log"
 	"github.com/goccy/go-json"
 	"github.com/phuslu/shardmap"
 )
@@ -19,7 +18,7 @@ var CacheDir = func () (string) {
 	
 	err := os.MkdirAll(cacheDir, 0700)
 	if (err != nil) {
-		log.Fatalln(fmt.Errorf("%s. please give me home directory perms pwease",err.Error()))
+		log.Fatal(fmt.Errorf("%s. please give me home directory perms pwease",err.Error()))
 	}
 	
 	return cacheDir
@@ -37,7 +36,7 @@ var cacheLockList = func () (*shardmap.Map[string, *sync.Mutex]) {
 	}
 
 	if (err != nil) {
-		log.Fatalln(fmt.Errorf("%s. please give me home directory perms pwease",err.Error()))
+		log.Fatal(fmt.Errorf("%s. please give me home directory perms pwease",err.Error()))
 	}
 
 	cacheListArray := []string{} // "umm acksually its called a schlice"
@@ -66,12 +65,12 @@ func SaveCacheList() {
 
 	cacheListData, err := json.Marshal(cacheListArray)
 	if (err != nil) {
-		log.Println("Failed to save Cache List.")
+		log.Warn("Failed to save Cache List.")
 	}
 
 	err = os.WriteFile(cacheListFile, cacheListData, 0777)
 	if (err != nil) {
-		log.Println("Failed to save Cache List.")
+		log.Warn("Failed to save Cache List.")
 	}
 }
 

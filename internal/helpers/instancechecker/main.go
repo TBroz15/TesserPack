@@ -1,10 +1,11 @@
 package instancechecker
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"tesserpack/internal/helpers"
+
+	"github.com/charmbracelet/log"
 
 	"github.com/gofrs/flock"
 )
@@ -25,12 +26,12 @@ func New() (InstanceChecker) {
 func (checker *InstanceChecker) CheckLock()  {
 	isLocked, err := checker.fileLock.TryLock()
 	if err != nil {
-		fmt.Println("Error Getting Lock:", err)
+		log.Error("Failed to check lock file", "err", err)
 		os.Exit(1)
 	}
 
 	if !isLocked {
-		fmt.Println("WARN: There are multiple instances of TesserPack running right now. Running many instances of it can slow down your computer.")
+		log.Warn("There are multiple instances of TesserPack running right now. Running many instances of it can slow down your computer.")
 	}
 }
 
@@ -38,7 +39,7 @@ func (checker *InstanceChecker) Unlock() {
 	err := checker.fileLock.Unlock()
 	
 	if err != nil {
-		fmt.Println("Error Unlocking:", err)
+		log.Error("Failed to unlock lock file", "err", err)
 		os.Exit(1)
 	}
 

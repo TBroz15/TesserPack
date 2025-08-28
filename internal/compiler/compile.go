@@ -5,7 +5,6 @@ import (
 
 	"archive/zip"
 	"context"
-	"fmt"
 	"io/fs"
 	"os"
 	"path"
@@ -15,6 +14,7 @@ import (
 	"tesserpack/internal/types"
 
 	"github.com/charlievieth/fastwalk"
+	"github.com/charmbracelet/log"
 	"github.com/phuslu/shardmap"
 	"github.com/saracen/fastzip"
 
@@ -22,7 +22,7 @@ import (
 )
 
 func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Config) (error) {
-	fmt.Printf("Compiling \"%v\"\n", originalInPath)
+	log.Infof("Compiling \"%v\"", originalInPath)
 
 	waitGroup := sync.WaitGroup{}
 	mutex := sync.RWMutex{}
@@ -48,7 +48,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 			)
 
 			if (err != nil) {
-				fmt.Printf("Error when creating dir \"%v\": %v\n", rel, err)
+				log.Error("Failed to create dir", "dir", rel, "err", err)
 			}
 
 			return nil
@@ -73,7 +73,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 
 		jsonExt := filepath.Ext(srcFile)
 
-		go Cached(srcFile, outFile, jsonExt, StripJSON, conf, &waitGroup)
+		go Cached(srcFile, outFile, jsonExt, StripJSON, conf, &waitGroup, inPath)
 	}
 
 	for _, LANGFile := range sortedFiles.LANG {
@@ -82,7 +82,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		srcFile := path.Join(inPath, LANGFile)
 		outFile := path.Join(tempPackDir, LANGFile)
 
-		go Cached(srcFile, outFile, ".lang", StripLANG, conf, &waitGroup)
+		go Cached(srcFile, outFile, ".lang", StripLANG, conf, &waitGroup, inPath)
 	}
 
 	// copy the uncompiled files
@@ -96,31 +96,31 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 			defer waitGroup.Done()
 
 			err := helpers.LinkOrCopy(srcFile, outFile)
-			if (err != nil) {fmt.Printf("Error Copying \"%v\": %v\n", srcFile, err)}
+			if (err != nil) {log.Error("Failed to copy file", "file", srcFile, "err", err)}
 		}(ETCFile)
 	}
 
 	waitGroup.Wait()
 
-	fmt.Println("Finished optimizing JSON & LANG files.")
+	log.Info("Finished optimizing JSON & LANG files.")
 	
 	for _, PNGFile := range sortedFiles.PNG {
 		srcFile := path.Join(inPath, PNGFile)
 		outFile := path.Join(tempPackDir, PNGFile)
 
-		Cached(srcFile, outFile, ".png", CompressPNG, conf, nil)
+		Cached(srcFile, outFile, ".png", CompressPNG, conf, nil, inPath)
 	}
 
-	fmt.Println("Finished optimizing PNG files.")
+	log.Info("Finished optimizing PNG files.")
 
 	for _, JPGFile := range sortedFiles.JPG {
 		srcFile := path.Join(inPath, JPGFile)
 		outFile := path.Join(tempPackDir, JPGFile)
 
-		Cached(srcFile, outFile, ".jpg", CompressJPG, conf, nil)
+		Cached(srcFile, outFile, ".jpg", CompressJPG, conf, nil, inPath)
 	}
 
-	fmt.Println("Finished optimizing JPEG files.")
+	log.Info("Finished optimizing JPEG files.")
 
 	shardedCompiledFiles := shardmap.New[string, os.FileInfo](len(files))
 	
@@ -131,7 +131,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		info, err := os.Stat(compiledFile)
 
 		if (err != nil) {
-			fmt.Printf("Weird... It seems file \"%v\" was ignored.\n", compiledFile)
+			log.Warn("Weird... It seems file \"%v\" was ignored.\n", compiledFile)
 			return nil
 		}
 
@@ -141,6 +141,8 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 	})
 
 	if (err != nil) {return err}
+
+	log.Infof("Compressing pack to \"%v\"", path.Base(outPath))
 
 	// turn it into a normal map
 	compiledFiles := map[string]os.FileInfo{}
@@ -163,8 +165,8 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
   		return err
 	}
 
-	fmt.Printf("Successfully optimized \"%v\"\n", filepath.Base(originalInPath))
-	fmt.Printf("Optimized pack is located at \"%v\"\n", outPath)
+	log.Infof("Successfully optimized \"%v\"", filepath.Base(originalInPath))
+	log.Infof("Optimized pack is located at \"%v\"", outPath)
 
 	cache.SaveCacheList()
 

@@ -11,6 +11,7 @@ import (
 	"tesserpack/internal/helpers/instancechecker"
 	"tesserpack/internal/types"
 
+	"github.com/charmbracelet/log"
 	"github.com/saracen/fastzip"
 )
 
@@ -68,6 +69,8 @@ func StartCompile(conf *types.Config) error {
 
 	// If user is trying to recompile a pack
 
+	log.Info("Extracting zip file...")
+
 	tempUnzippedPackDir, err := helpers.MkTempPackDir(inPathBase+"-unzipped")
 	if (err != nil) {return err}
 
@@ -78,6 +81,8 @@ func StartCompile(conf *types.Config) error {
 	if err = extractor.Extract(context.Background()); err != nil {
   		return err
 	}
+
+	log.Info("Zip file successfully extracted.")
 
 	Compile(tempUnzippedPackDir, inPathAbs, outPathAbs, tempPackDir, conf)
 
@@ -90,7 +95,7 @@ func StartCompile(conf *types.Config) error {
 			defer waitGroup.Done()
 			err := os.RemoveAll(path)
 			if err != nil {
-				fmt.Printf("Error removing %s: %v\n", path, err)
+				log.Error("Failed to remove directory", "err", err, "dir", path)
 			}
 		}(dir)
 	}

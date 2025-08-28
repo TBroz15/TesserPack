@@ -1,11 +1,13 @@
 package compiler
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
 	"sync"
 	"tesserpack/internal/helpers/cache"
 	"tesserpack/internal/types"
+
+	"github.com/charmbracelet/log"
 )
 
 func Cached(
@@ -14,15 +16,22 @@ func Cached(
 	ext string,
 	processor func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, waitGroup *sync.WaitGroup) (processedData []byte, err error),
 	conf *types.Config,
-	waitGroup *sync.WaitGroup) {
+	waitGroup *sync.WaitGroup,
+	basePath string) {
 
 	if (waitGroup != nil) {
 		defer waitGroup.Done()
 	}
 
+	baseFile, err := filepath.Rel(basePath, srcFile)
+	if err != nil {
+		log.Error("Failed to get relative file path", "err", err, "file", srcFile,)
+		return
+	}
+
 	fileContent, err := os.ReadFile(srcFile)
 	if err != nil {
-		fmt.Printf("Error Reading \"%v\": %v\n", srcFile, err)
+		log.Error("Failed to read file", "err", err, "file", baseFile)
 		return
 	}
 
@@ -30,7 +39,7 @@ func Cached(
 	
 	cacheExist, err := cache.TryCopyCache(hashFile, outFile) 
 	if err != nil {
-		fmt.Printf("Error Reading Cache of \"%v\": %v\n", srcFile, err)
+		log.Error("Failed to read cache", "err", err, "file", baseFile)
 		return
 	}
 
@@ -38,7 +47,7 @@ func Cached(
 
 	processedData, err := processor(&fileContent, &outFile, &srcFile, conf, nil)
 	if (err != nil) {
-		fmt.Printf("Error Processing \"%v\": %v", srcFile, err)
+		log.Error("Failed to process file", "err", err, "file", baseFile)
 		return
 	}
 
@@ -46,12 +55,12 @@ func Cached(
 
 	err = cache.SaveCache(hashFile, processedData)
 	if err != nil {
-		fmt.Printf("Error Saving Cache of \"%v\": %v\n", srcFile, err)
+		log.Error("Failed to save cache of file", "err", err, "file", baseFile)
 	}
 
 	_, err = cache.TryCopyCache(hashFile, outFile) 
 	if err != nil {
-		fmt.Printf("Error Reading Cache of \"%v\": %v\n", srcFile, err)
+		log.Error("Failed to read cache of file", "err", err, "file", baseFile)
 		return
 	}
 }

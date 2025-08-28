@@ -1,12 +1,12 @@
 package compiler
 
 import (
-	"fmt"
 	"os"
 	"sync"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/types"
 
+	"github.com/charmbracelet/log"
 	"github.com/cshum/vipsgen/vips"
 )
 
@@ -34,7 +34,7 @@ func CompressPNG(data *[]byte, outFile *string, srcFile *string, conf *types.Con
 
 	info, err := os.Stat(*srcFile)
 	if err != nil {
-		fmt.Printf("Error Reading Info \"%v\": %v\n", srcFile, err)
+		log.Error("Failed to read file stats", "err", err, "file", srcFile)
 		return
 	}
 
@@ -68,7 +68,7 @@ func CompressJPG(data *[]byte, outFile *string, srcFile *string, conf *types.Con
 
 	info, err := os.Stat(*srcFile)
 	if err != nil {
-		fmt.Printf("Error Reading Info \"%v\": %v\n", srcFile, err)
+		log.Error("Failed to read file stats", "err", err, "file", srcFile)
 		return
 	}
 
