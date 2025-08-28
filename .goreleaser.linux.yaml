@@ -40,7 +40,6 @@ checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.linux.txt"
 
 release:
-  name_template: "{{ .TagSubject }} - {{ .Summary }}"
   footer: >-
 
     ---
