@@ -15,7 +15,7 @@ func Cached(
 	srcFile string,
 	outFile string,
 	ext string,
-	processor func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, waitGroup *sync.WaitGroup) (processedData []byte, err error),
+	processor types.ProcessorFunc,
 	conf *types.Config,
 	waitGroup *sync.WaitGroup,
 	basePath string) {

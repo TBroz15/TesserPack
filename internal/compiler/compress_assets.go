@@ -14,7 +14,7 @@ import (
 // I tried it with a simple go func() and wait group, but my PC will crap itself
 // we're going to leave it synchronized first - tuxebro, 2025
 
-func CompressPNG(data *[]byte, outFile *string, srcFile *string, conf *types.Config, _ *sync.WaitGroup) (processedData []byte, err error) {
+var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, _ *sync.WaitGroup) (processedData []byte, err error) {
 	img, err := vips.NewPngloadBuffer(*data, nil)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func CompressPNG(data *[]byte, outFile *string, srcFile *string, conf *types.Con
 	return buf, nil
 }
 
-func CompressJPG(data *[]byte, outFile *string, srcFile *string, conf *types.Config, _ *sync.WaitGroup) (processedData []byte, err error) {
+var CompressJPG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, _ *sync.WaitGroup) (processedData []byte, err error) {
 	img, err := vips.NewJpegloadBuffer(*data, nil)
 	if err != nil {
 		return nil, err

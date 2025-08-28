@@ -17,7 +17,7 @@ import (
 	"github.com/titanous/json5"
 )
 
-func StripJSON(data *[]byte, outFile *string, srcFile *string, conf *types.Config, waitGroup *sync.WaitGroup) (processedData []byte, err error) {
+var StripJSON types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, waitGroup *sync.WaitGroup) (processedData []byte, err error) {
 	if (waitGroup != nil) {
 		defer waitGroup.Done()
 	}
