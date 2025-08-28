@@ -1,14 +1,14 @@
 package cache
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"os"
 	"path"
 	"sync"
 	"tesserpack/internal/helpers"
+
+	"github.com/cespare/xxhash"
 
 	"github.com/goccy/go-json"
 	"github.com/phuslu/shardmap"
@@ -76,10 +76,10 @@ func SaveCacheList() {
 }
 
 func GetHashFile(data *[]byte, ext string) (string) {
-	hash 	:= md5.Sum(*data)
-	hexHash := hex.EncodeToString(hash[:])
+	hash := xxhash.Sum64(*data)
+	size := len(*data)
 
-	return hexHash + ext
+	return fmt.Sprintf("%x-%d", hash, size)
 }
 
 func TryCopyCache(hashFile string, outFile string) (cacheExists bool, err error) {	

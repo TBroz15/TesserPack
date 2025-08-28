@@ -3,6 +3,7 @@ module tesserpack
 go 1.25
 
 require (
+	github.com/cespare/xxhash v1.1.0
 	github.com/charlievieth/fastwalk v1.0.12
 	github.com/cshum/vipsgen v1.1.2
 	github.com/goccy/go-json v0.10.5

@@ -1,7 +1,9 @@
+github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
+github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
+github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
+github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
 github.com/charlievieth/fastwalk v1.0.12 h1:pwfxe1LajixViQqo7EFLXU2+mQxb6OaO0CeNdVwRKTg=
 github.com/charlievieth/fastwalk v1.0.12/go.mod h1:yGy1zbxog41ZVMcKA/i8ojXLFsuayX5VvwhQVoj9PBI=
-github.com/cshum/vipsgen v1.1.1 h1:uOYVqHE3+zJ8qOJIeEYspJJl64Kpw48MnLkB+FEsMZE=
-github.com/cshum/vipsgen v1.1.1/go.mod h1:1GboZQcNmo4NwuNnGogM24m3O+1i6UpnvurqMcsFItE=
 github.com/cshum/vipsgen v1.1.2 h1:7kFUxlCBx4bAd69YwWagOGYC8/7vkXJuzCFV6tmPYvU=
 github.com/cshum/vipsgen v1.1.2/go.mod h1:1GboZQcNmo4NwuNnGogM24m3O+1i6UpnvurqMcsFItE=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -24,6 +26,8 @@ github.com/saracen/fastzip v0.1.11 h1:NnExbTEJbya7148cov09BCxwfur9tQ5BQ1QyQH6Xle
 github.com/saracen/fastzip v0.1.11/go.mod h1:/lN5BiU451/OZMS+hfhVsSDj/RNrxYmO9EYxCtMrFrY=
 github.com/saracen/zipextra v0.0.0-20250129175152-f1aa42d25216 h1:8zyjtFyKi5NJySVOJRiHmSN1vl6qugQ5n9C4X7WyY3U=
 github.com/saracen/zipextra v0.0.0-20250129175152-f1aa42d25216/go.mod h1:hnzuad9d2wdd3z8fC6UouHQK5qZxqv3F/E6MMzXc7q0=
+github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72 h1:qLC7fQah7D6K1B0ujays3HV9gkFtllcxhzImRR7ArPQ=
+github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/tidwall/jsonc v0.3.2 h1:ZTKrmejRlAJYdn0kcaFqRAKlxxFIC21pYq8vLa4p2Wc=
