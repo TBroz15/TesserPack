@@ -4,17 +4,39 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"tesserpack/internal/compiler"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/types"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/urfave/cli/v3"
 )
 
 func main() {
+	cli.SubcommandHelpTemplate = SubCommandHelpTemplate
+	
+	grassBlock := lipgloss.NewStyle().
+    	SetString("⬒").
+    	Foreground(lipgloss.Color("#2f9e44")).
+		Render()
+
+	tesserpackTitle := lipgloss.NewStyle().
+		SetString("TesserPack").
+		Underline(true).
+		Bold(true).
+		Render()
+
+	tesserpackVersion := lipgloss.NewStyle().
+		SetString("v0.4").
+		Italic(true).
+		Render()
+
+	fmt.Printf("\n %v  %v %v\n\n", grassBlock, tesserpackTitle,tesserpackVersion)
+
 	subCommands := []*cli.Command{
 		{
 			Name:    "compile",
@@ -81,9 +103,10 @@ func main() {
 	cmd := &cli.Command{
 		EnableShellCompletion: true,
         Name:  "tesserpack",
-        Usage: "A build tool that compiles and optimize Minecraft packs for easier download. You know why you download this right?\nhttps://github.com/TBroz15/TesserPack",
 		Commands: subCommands,
-    }
+		CustomRootCommandHelpTemplate: RootHelpTemplate,
+		Suggest: true,
+	}
 
     if err := cmd.Run(context.Background(), os.Args); err != nil {
         log.Fatal(err)
