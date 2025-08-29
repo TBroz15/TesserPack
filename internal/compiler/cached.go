@@ -37,6 +37,14 @@ func Cached(
 	}
 
 	hashFile := cache.GetHashFile(&fileContent, ext)
+
+	isSkipped, err := cache.CheckSkip(hashFile, srcFile, outFile)
+	if err != nil {
+		log.Error("Failed to read cache", "err", err, "file", baseFile)
+		return
+	}
+
+	if (isSkipped) {return}
 	
 	cacheExist, err := cache.TryCopyCache(hashFile, outFile) 
 	if err != nil {
@@ -58,7 +66,11 @@ func Cached(
 		return
 	}
 
-	if processedData == nil {return}
+	// asset processors tend to skip and not include processedData
+	if processedData == nil {
+		cache.AddToSkipList(hashFile)
+		return
+	}
 
 	err = cache.SaveCache(hashFile, processedData)
 	if err != nil {
