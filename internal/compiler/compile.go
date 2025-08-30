@@ -168,7 +168,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 	log.Infof("Successfully optimized \"%v\"", filepath.Base(originalInPath))
 	log.Infof("Optimized pack is located at \"%v\"", outPath)
 
-	cache.SaveCacheLists()
+	cache.SaveLists()
 
 	return nil
 }

@@ -80,7 +80,7 @@ var cacheLockList = readList[sync.Mutex](cacheListFile)
 var skipList      = readList[bool](skipListFile)
 
 // Run this after successful compilation
-func SaveCacheLists() {
+func SaveLists() {
 	saveList(cacheListFile, cacheLockList)
 	saveList(skipListFile,  skipList)
 }
