@@ -8,8 +8,8 @@
 - [x] Caching
 - [ ] Config
 - [ ] Proper error checking
-- [ ] Fix some memory leaks (likely related to JSON & LANG stripping)
-- [ ] Worker pool? (might fix memleaks)
+- [ ] Fix some memory leaks (related to entire compiler)
+    - [ ] Via thread pool? (also have an non-thread pool option)
 - [ ] v0 GUI w/ wails
 
 ### After v1.0
