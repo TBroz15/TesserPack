@@ -1,8 +1,6 @@
 package compiler
 
 import (
-	// "context"
-
 	"archive/zip"
 	"context"
 	"io/fs"
@@ -65,6 +63,11 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 
 	sortedFiles := helpers.SortFiles(&files, tempPackDir)
 
+	process := Cached // caching is enabled by default
+	if (!conf.IsCached) {
+		process = NonCached
+	}
+
 	for _, JSONFile := range sortedFiles.JSON {
 		waitGroup.Add(1)
 		
@@ -73,7 +76,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 
 		jsonExt := filepath.Ext(srcFile)
 
-		go Cached(srcFile, outFile, jsonExt, StripJSON, conf, &waitGroup, inPath)
+		go process(srcFile, outFile, jsonExt, StripJSON, conf, &waitGroup, inPath)
 	}
 
 	for _, LANGFile := range sortedFiles.LANG {
@@ -82,7 +85,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		srcFile := path.Join(inPath, LANGFile)
 		outFile := path.Join(tempPackDir, LANGFile)
 
-		go Cached(srcFile, outFile, ".lang", StripLANG, conf, &waitGroup, inPath)
+		go process(srcFile, outFile, ".lang", StripLANG, conf, &waitGroup, inPath)
 	}
 
 	// copy the uncompiled files
@@ -108,7 +111,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		srcFile := path.Join(inPath, PNGFile)
 		outFile := path.Join(tempPackDir, PNGFile)
 
-		Cached(srcFile, outFile, ".png", CompressPNG, conf, nil, inPath)
+		process(srcFile, outFile, ".png", CompressPNG, conf, nil, inPath)
 	}
 
 	log.Info("Finished optimizing PNG files.")
@@ -117,7 +120,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		srcFile := path.Join(inPath, JPGFile)
 		outFile := path.Join(tempPackDir, JPGFile)
 
-		Cached(srcFile, outFile, ".jpg", CompressJPG, conf, nil, inPath)
+		process(srcFile, outFile, ".jpg", CompressJPG, conf, nil, inPath)
 	}
 
 	log.Info("Finished optimizing JPEG files.")

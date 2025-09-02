@@ -5,13 +5,12 @@ import (
 	"path/filepath"
 	"sync"
 	"tesserpack/internal/helpers"
-	"tesserpack/internal/helpers/cache"
 	"tesserpack/internal/types"
 
 	"github.com/charmbracelet/log"
 )
 
-func Cached(
+func NonCached(
 	srcFile string,
 	outFile string,
 	ext string,
@@ -36,24 +35,6 @@ func Cached(
 		return
 	}
 
-	hashFile := cache.GetHashFile(&fileContent, ext)
-
-	isSkipped, err := cache.CheckSkip(hashFile, srcFile, outFile)
-	if err != nil {
-		log.Error("Failed to read cache", "err", err, "file", baseFile)
-		return
-	}
-
-	if (isSkipped) {return}
-	
-	cacheExist, err := cache.TryCopyCache(hashFile, outFile) 
-	if err != nil {
-		log.Error("Failed to read cache", "err", err, "file", baseFile)
-		return
-	}
-
-	if cacheExist {return}
-
 	processedData, err := processor(&fileContent, &outFile, &srcFile, conf, nil)
 	if (err != nil) {
 		log.Error("Failed to process file. Copying the original instead", "err", err, "file", baseFile)
@@ -65,21 +46,8 @@ func Cached(
 		return
 	}
 
-	// asset processors tend to skip and not include processedData
-	if processedData == nil {
-		cache.AddToSkipList(hashFile)
-		return
-	}
-
-	err = cache.SaveCache(hashFile, processedData)
+	err = os.WriteFile(outFile, processedData, 0777)
 	if err != nil {
-		log.Error("Failed to save cache of file", "err", err, "file", baseFile)
-		return
-	}
-
-	_, err = cache.TryCopyCache(hashFile, outFile)
-	if err != nil {
-		log.Error("Failed to read cache of file", "err", err, "file", baseFile)
-		return
+		log.Error("Failed to write file", "err", err, "file", baseFile)
 	}
 }

@@ -61,16 +61,24 @@ func main() {
 					Usage:    "TesserPack will assume every .json file has no comments.", 
 					Required: false,
 				},
+				&cli.BoolFlag{
+					Name:     "disable-cache",
+					Aliases:  []string{"dc"},
+					Usage:    "TesserPack will complie everything from scratch.",
+					Required: false,
+				},
 			},
 			Action: func(ctx context.Context, cmd *cli.Command) error {
 				inPath       := cmd.String("in")
 				outPath      := cmd.String("out")
 				isStrictJSON := cmd.Bool("strict-json")
+				isCached	 := !cmd.Bool("disable-cache")
 
 				conf := types.Config{
 					InPath:       inPath,
 					OutPath:      outPath,
 					IsStrictJSON: isStrictJSON,
+					IsCached:     isCached,
 				} 
 	
 				err := compiler.StartCompile(&conf)
