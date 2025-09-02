@@ -10,6 +10,7 @@ import (
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/helpers/cache"
 	"tesserpack/internal/types"
+	"time"
 
 	"github.com/charlievieth/fastwalk"
 	"github.com/charmbracelet/log"
@@ -32,6 +33,16 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		ToSlash: false,
 	}
 
+	var operTime struct{
+		walkAndSort time.Duration;
+		jsonLangCpy time.Duration;
+		png 	    time.Duration;
+		jpeg 	    time.Duration;
+		walkAndInfo time.Duration
+		compression time.Duration
+	};
+	
+	timeNow := time.Now()
 	err := fastwalk.Walk(&fastWalkConf, inPath, func(path string, entry fs.DirEntry, err error) error {
 		if (err != nil) {return err}
 
@@ -62,12 +73,14 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 	if (err != nil) {return err}
 
 	sortedFiles := helpers.SortFiles(&files, tempPackDir)
+	operTime.walkAndSort = time.Since(timeNow)
 
 	process := Cached // caching is enabled by default
 	if (!conf.IsCached) {
 		process = NonCached
 	}
 
+	timeNow = time.Now()
 	for _, JSONFile := range sortedFiles.JSON {
 		waitGroup.Add(1)
 		
@@ -104,27 +117,35 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 	}
 
 	waitGroup.Wait()
+	operTime.jsonLangCpy = time.Since(timeNow)
 
 	log.Info("Finished optimizing JSON & LANG files.")
 	
+	timeNow = time.Now()
 	for _, PNGFile := range sortedFiles.PNG {
 		srcFile := path.Join(inPath, PNGFile)
 		outFile := path.Join(tempPackDir, PNGFile)
 
 		process(srcFile, outFile, ".png", CompressPNG, conf, nil, inPath)
 	}
+	operTime.png = time.Since(timeNow)
 
 	log.Info("Finished optimizing PNG files.")
 
+	timeNow = time.Now()
 	for _, JPGFile := range sortedFiles.JPG {
 		srcFile := path.Join(inPath, JPGFile)
 		outFile := path.Join(tempPackDir, JPGFile)
 
 		process(srcFile, outFile, ".jpg", CompressJPG, conf, nil, inPath)
 	}
+	operTime.jpeg = time.Since(timeNow)
 
 	log.Info("Finished optimizing JPEG files.")
 
+	log.Infof("Compressing pack to \"%v\"", path.Base(outPath))
+
+	timeNow = time.Now()
 	shardedCompiledFiles := shardmap.New[string, os.FileInfo](len(files))
 	
 	err = fastwalk.Walk(&fastWalkConf, tempPackDir, func(compiledFile string, entry fs.DirEntry, err error) error {
@@ -145,8 +166,6 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 
 	if (err != nil) {return err}
 
-	log.Infof("Compressing pack to \"%v\"", path.Base(outPath))
-
 	// turn it into a normal map
 	compiledFiles := map[string]os.FileInfo{}
 	shardedCompiledFiles.Range(func(key string, value os.FileInfo) bool {
@@ -154,7 +173,9 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		return true
 	})
 	shardedCompiledFiles.Clear()
+	operTime.walkAndInfo = time.Since(timeNow)
 
+	timeNow = time.Now()
 	zipFile, err := os.Create(outPath)
 	if err != nil {return err}
 	defer zipFile.Close()
@@ -167,9 +188,18 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 	if err = archiver.Archive(context.Background(), compiledFiles); err != nil {
   		return err
 	}
+	operTime.compression = time.Since(timeNow)
 
 	log.Infof("Successfully optimized \"%v\"", filepath.Base(originalInPath))
 	log.Infof("Optimized pack is located at \"%v\"", outPath)
+
+	log.Debug("Operation Time:",
+				"\nWalk Directory and Sorting", operTime.walkAndSort,
+				"\nJSON, LANG optimization and File Copying", operTime.jsonLangCpy,
+				"\nPNG Optimization", operTime.png,
+				"\nJPG Optimization", operTime.jpeg,
+				"\nWalk Optimized Pack and Get FileInfo", operTime.walkAndInfo,
+				"\nCompression", operTime.compression)
 
 	cache.SaveLists()
 

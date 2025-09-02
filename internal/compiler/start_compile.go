@@ -10,6 +10,7 @@ import (
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/helpers/instancechecker"
 	"tesserpack/internal/types"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/saracen/fastzip"
@@ -17,6 +18,11 @@ import (
 
 // Do some preparation before compilation
 func StartCompile(conf *types.Config) error {
+	timeStart := time.Now()
+	defer func (){
+		log.Debugf("Total Compile Time: %v", time.Since(timeStart))
+	}()
+
     instanceChecker := instancechecker.New()
 	
 	inPathStat, err := os.Stat(conf.InPath)
@@ -71,6 +77,7 @@ func StartCompile(conf *types.Config) error {
 
 	log.Info("Extracting zip file...")
 
+	timeNow := time.Now()
 	tempUnzippedPackDir, err := helpers.MkTempPackDir(inPathBase+"-unzipped")
 	if (err != nil) {return err}
 
@@ -81,6 +88,7 @@ func StartCompile(conf *types.Config) error {
 	if err = extractor.Extract(context.Background()); err != nil {
   		return err
 	}
+	log.Debugf("Zip extraction took: %v", time.Since(timeNow))
 
 	log.Info("Zip file successfully extracted.")
 

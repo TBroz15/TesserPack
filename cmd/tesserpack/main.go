@@ -68,12 +68,23 @@ func main() {
 					Usage:    "TesserPack will complie everything from scratch.",
 					Required: false,
 				},
+				&cli.BoolFlag{
+					Name:     "debug",
+					Aliases:  []string{"d"},
+					Usage:    "Sets logs to debug level. Don't enable, if you don't want to bomb your terminal with info.",
+					Required: false,
+				},
 			},
 			Action: func(ctx context.Context, cmd *cli.Command) error {
 				inPath       := cmd.String("in")
 				outPath      := cmd.String("out")
 				isStrictJSON := cmd.Bool("strict-json")
 				isCached	 := !cmd.Bool("disable-cache")
+				doDebugMode	 := cmd.Bool("debug")
+
+				if (doDebugMode) {
+					log.SetLevel(log.DebugLevel)
+				}
 
 				conf := types.Config{
 					InPath:       inPath,
