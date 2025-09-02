@@ -7,7 +7,7 @@
 - [x] Proper Linux Support (libvips is the problem)
 - [x] Caching
 - [ ] Config
-- [ ] Proper error checking
+- [x] (Not so) Proper error checking
 - [ ] Fix some memory leaks (related to entire compiler)
     - [ ] Via thread pool? (also have an non-thread pool option)
 - [ ] v0 GUI w/ wails
