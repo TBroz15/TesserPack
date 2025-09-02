@@ -9,6 +9,7 @@ import (
 
 	"tesserpack/internal/compiler"
 	"tesserpack/internal/helpers"
+	"tesserpack/internal/helpers/cache"
 	"tesserpack/internal/types"
 
 	"github.com/charmbracelet/lipgloss"
@@ -102,6 +103,21 @@ func main() {
 				if (err != nil) {return err}
 
 				log.Info("Successfully cleared temporary directories.")
+
+				return nil
+			},
+		},
+		{
+			Name: 	 "clear-cache",
+			Aliases: []string{"cc"},
+			Usage:   "Clears all cache files.",
+			Action: func(ctx context.Context, c *cli.Command) error {
+				log.Info("Clearing cache files...")
+
+				err := cache.ClearCacheDir()
+				if (err != nil) {return err}
+
+				log.Info("Successfully cleared cache files.")
 
 				return nil
 			},

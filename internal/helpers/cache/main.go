@@ -24,6 +24,10 @@ var CacheDir = func () (string) {
 	return cacheDir
 }()
 
+func ClearCacheDir() (error) {
+	return os.RemoveAll(CacheDir)
+}
+
 func readList[T any](listFile string) (*shardmap.Map[string, *T]) {
 	listData, err := os.ReadFile(listFile)
 	if os.IsNotExist(err) {
