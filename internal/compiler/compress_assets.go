@@ -1,12 +1,9 @@
 package compiler
 
 import (
-	"os"
 	"sync"
-	"tesserpack/internal/helpers"
 	"tesserpack/internal/types"
 
-	"github.com/charmbracelet/log"
 	"github.com/cshum/vipsgen/vips"
 )
 
@@ -32,17 +29,8 @@ var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFil
 		return nil, err
 	}
 
-	info, err := os.Stat(*srcFile)
-	if err != nil {
-		log.Error("Failed to read file stats", "err", err, "file", srcFile)
-		return
-	}
-
-	size := int(info.Size())
-
-	// copy the original image if "optimized" image has bigger has file size
-	if (len(buf) > size) {
-		return nil, helpers.LinkOrCopy(*srcFile, *outFile)			
+	if (len(buf) >= len(*data)) {
+		return nil, nil
 	}
 
 	return buf, nil
@@ -66,17 +54,8 @@ var CompressJPG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFil
 		return nil, err
 	}
 
-	info, err := os.Stat(*srcFile)
-	if err != nil {
-		log.Error("Failed to read file stats", "err", err, "file", srcFile)
-		return
-	}
-
-	size := int(info.Size())
-
-	// copy the original image if "optimized" image has bigger has file size
-	if (len(buf) > size) {
-		return nil, helpers.LinkOrCopy(*srcFile, *outFile)			
+	if (len(buf) >= len(*data)) {
+		return nil, nil
 	}
 
 	return buf, nil

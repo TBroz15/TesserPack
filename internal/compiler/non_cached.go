@@ -36,10 +36,12 @@ func NonCached(
 	}
 
 	processedData, err := processor(&fileContent, &outFile, &srcFile, conf, nil)
-	if (err != nil) {
+	if err != nil {
 		log.Error("Failed to process file. Copying the original instead", "err", err, "file", baseFile)
+	}
 
-		err := helpers.LinkOrCopy(srcFile, outFile)		
+	if processedData == nil {
+		err = helpers.LinkOrCopy(srcFile, outFile)		
 		if err != nil {
 			log.Error("Failed to copy file", "err", err, "file", baseFile)
 		}
