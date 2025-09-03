@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 
 	"tesserpack/internal/compiler"
 	"tesserpack/internal/helpers"
@@ -73,6 +74,19 @@ func main() {
 					Aliases:  []string{"d"},
 					Usage:    "Sets logs to debug level. Don't enable, if you don't want to bomb your terminal with info.",
 					Required: false,
+				},
+				&cli.BoolFlag{
+					Name:     "uncontrolled",
+					Aliases:  []string{"u"},
+					Usage:    "TesserPack will use unlimited Goroutines instead of thread pools. Recommended for small packs.",
+					Required: false,
+				},
+				&cli.Uint16Flag{
+					Name:     "threads",
+					Aliases:  []string{"t"},
+					Usage:    "Sets the limit of threads for TesserPack to use. Recommended for multitasking without lag.",
+					Required: false,
+					Value:    uint16(runtime.NumCPU()),
 				},
 			},
 			Action: func(ctx context.Context, cmd *cli.Command) error {
