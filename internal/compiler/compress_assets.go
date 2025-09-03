@@ -11,6 +11,18 @@ import (
 // I tried it with a simple go func() and wait group, but my PC will crap itself
 // we're going to leave it synchronized first - tuxebro, 2025
 
+var defaultPngOptions = &vips.PngsaveBufferOptions{
+	Compression: 9,
+	Interlace: false,
+	Effort: 9,
+}
+
+var defaultJpgOptions = &vips.JpegsaveBufferOptions{
+	Interlace: false,
+	OptimizeCoding: true,
+	OptimizeScans: true,
+}
+
 var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, _ *sync.WaitGroup) (processedData []byte, err error) {
 	img, err := vips.NewPngloadBuffer(*data, nil)
 	if err != nil {
@@ -19,11 +31,7 @@ var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFil
 	defer img.Close()
 
 
-	buf, err := img.PngsaveBuffer(&vips.PngsaveBufferOptions{
-		Compression: 9,
-		Interlace: false,
-		Effort: 9,
-	})
+	buf, err := img.PngsaveBuffer(defaultPngOptions)
 
 	if err != nil {
 		return nil, err
@@ -43,12 +51,7 @@ var CompressJPG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFil
 	}
 	defer img.Close()
 
-
-	buf, err := img.JpegsaveBuffer(&vips.JpegsaveBufferOptions{
-		Interlace: false,
-		OptimizeCoding: true,
-		OptimizeScans: true,
-	})
+	buf, err := img.JpegsaveBuffer(defaultJpgOptions)
 
 	if err != nil {
 		return nil, err
