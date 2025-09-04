@@ -5,13 +5,12 @@ type JSONConfig struct {
 }
 
 type PNGConfig struct {
-	Progressive   bool `json:"progressive"`
 	CompressLevel byte `json:"compressLevel"`
 	Quality		  byte `json:"quality"`
+	Effort        byte `json:"effort"`
 }
 
 type JPGConfig struct {
-	Progressive   bool `json:"progressive"`
 	Quality		  byte `json:"quality"`
 }
 
