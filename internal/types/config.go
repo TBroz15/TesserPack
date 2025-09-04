@@ -22,13 +22,7 @@ type CompilerConfig struct {
 	Cache bool `json:"cache"`
 }
 
-type IgnoreConfig struct {
-	Dirs  []string `json:"dirs"`
-	Exts  []string `json:"exts"`
-	Files []string `json:"files"`
-}
-
 type TesserPackConfig struct {
-	Compiler CompilerConfig `json:"compiler"`
-	Ignore   IgnoreConfig   `json:"ignore"`
+	Compiler   CompilerConfig `json:"compiler"`
+	IgnoreGlob []string		  `json:"ignoreGlob"`
 }

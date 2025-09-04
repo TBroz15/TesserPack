@@ -3,7 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
+	"strings"
 	"tesserpack/internal/types"
 
 	"github.com/charmbracelet/huh"
@@ -46,7 +48,7 @@ func ConfigGen() {
 	conf := &types.TesserPackConfig{
 		Compiler: types.CompilerConfig{
 			JSON: types.JSONConfig{
-				Strict: true,
+				Strict: false,
 			},
 			PNG: types.PNGConfig{
 				Quality: 100,
@@ -68,15 +70,8 @@ func ConfigGen() {
 
 	err = huh.NewConfirm().
 		Title("Enable strict JSON?").
-		Description("When enabled, TesserPack will always assume all .json files are pure JSON without comments.\nIt will potentially increase optimization performance.").
+		Description("When enabled, TesserPack will always assume all .json files are pure JSON without comments.\nBut Minecraft Bedrock Edition can read JSON with comments.\nIt will potentially increase optimization performance.").
 		Value(&conf.Compiler.JSON.Strict).
-		Run()
-	logFatalOnErr()
-
-	err = huh.NewConfirm().
-		Title("Enable caching?").
-		Description("When enabled, TesserPack won't re-optimize assets, resulting in faster overall optimization.\nYou can run 'tesserpack clear-cache' since it will use up your storage.").
-		Value(&conf.Compiler.Cache).
 		Run()
 	logFatalOnErr()
 
@@ -104,16 +99,41 @@ func ConfigGen() {
 		&conf.Compiler.JPG.Quality, 1, 100)
 	logFatalOnErr()
 
-	err = huh.NewText().
-		Title("John balal?").
-		Description("When enabled, TesserPack will always assume all .json files are pure JSON without comments.\nIt will potentially increase optimization performance.").
-		
+	err = huh.NewConfirm().
+		Title("Enable caching?").
+		Description("When enabled, TesserPack won't waste CPU usage by storing already optimized assets.\nThis will result into faster overall optimization.\nYou can run 'tesserpack clear-cache' since it will use up your storage.").
+		Value(&conf.Compiler.Cache).
 		Run()
 	logFatalOnErr()
+
+	ignoreGlobPatterns := 
+`node_modules/
+.git/
+.vscode/
+.github/
+`
+	err = huh.NewForm(
+		huh.NewGroup(
+			huh.NewText().
+				Title("Ignore List").
+				Description("TesserPack will ignore files and directories via Glob patterns.\nGlob patterns are seperated by every new line.").
+				Value(&ignoreGlobPatterns).
+				ShowLineNumbers(true),		
+		),
+	).
+	WithShowHelp(true).
+	Run()
+	logFatalOnErr()
+	conf.IgnoreGlob = strings.Split(ignoreGlobPatterns, "\n")
+
+	conf.IgnoreGlob = slices.DeleteFunc(conf.IgnoreGlob, func(elm string) bool {
+		return elm == ""
+	})
 
 	// holy crap, minecraft movie reference
 	jsonMomoa, err := json.MarshalIndent(conf, "", "  ")
 	logFatalOnErr()
 
-	log.Info(".tesserpackrc is created in your working directory!", "content", string(jsonMomoa))
+	log.Info("", "content", string(jsonMomoa))
+	log.Info(".tesserpackrc is now created in your working directory!")
 }
