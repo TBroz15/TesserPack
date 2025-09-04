@@ -133,6 +133,23 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name: 	 "init",
+			Aliases: []string{"i"},
+			Usage:   "Creates a JSON5 configuration file (.tesserpackrc) through prompts.",
+			Action: func(ctx context.Context, c *cli.Command) error {
+				ConfigGen()
+
+				return nil
+			},
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:     "recommended",
+					Aliases:  []string{"r"},
+					Usage:    "Creates the recommended configuration straight away without prompts.",
+				},
+			},
+		},
 	}
 
 	cmd := &cli.Command{
