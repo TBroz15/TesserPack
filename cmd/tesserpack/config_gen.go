@@ -134,8 +134,8 @@ func ConfigGen(doCreateRecommended bool) {
 		},
 	}
 
-	if _, err := os.Stat(".tesserpackrc"); !os.IsNotExist(err) {
-		log.Fatalf(".tesserpackrc already exists in your working directory.")
+	if _, err := os.Stat(".tesserpackrc.json5"); !os.IsNotExist(err) {
+		log.Fatalf(".tesserpackrc.json5 already exists in your working directory.")
 	}
 
 	if (!doCreateRecommended) {
@@ -154,7 +154,7 @@ func ConfigGen(doCreateRecommended bool) {
 
 	log.Info("", "content", string(confJsonMomoa))
 
-	os.WriteFile(".tesserpackrc", confJsonMomoa, 0777)
+	os.WriteFile(".tesserpackrc.json5", confJsonMomoa, 0777)
 
-	log.Info(".tesserpackrc is now created in your working directory!")
+	log.Info(".tesserpackrc.json5 is now created in your working directory!")
 }
