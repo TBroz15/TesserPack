@@ -137,8 +137,9 @@ func main() {
 			Name: 	 "init",
 			Aliases: []string{"i"},
 			Usage:   "Creates a JSON5 configuration file (.tesserpackrc) through prompts.",
-			Action: func(ctx context.Context, c *cli.Command) error {
-				ConfigGen()
+			Action: func(ctx context.Context, cmd *cli.Command) error {
+				doCreateRecommended := cmd.Bool("recommended")
+				ConfigGen(doCreateRecommended)
 
 				return nil
 			},

@@ -35,5 +35,8 @@ dist/
 
 lib/
 
+.tesserpackrc
+
+# remove executables
 tesserpack
 tesserpack.exe

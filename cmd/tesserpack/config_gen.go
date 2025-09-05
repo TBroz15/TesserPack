@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
 	"slices"
 	"strconv"
 	"strings"
@@ -44,33 +45,15 @@ func safeIntInput[T int | uint | byte](title, description string, value *T, min,
 	return nil
 }
 
-func ConfigGen() {
-	conf := &types.TesserPackConfig{
-		Compiler: types.CompilerConfig{
-			JSON: types.JSONConfig{
-				Strict: false,
-			},
-			PNG: types.PNGConfig{
-				Quality: 100,
-				CompressLevel: 9,
-				Effort: 10,
-			},
-			JPG: types.JPGConfig{
-				Quality: 100,
-			},
-			Cache: true,
-		},
-	}
-
+func configGenPrompt(conf *types.TesserPackConfig) {
 	var err error;
-
 	logFatalOnErr := func() {
 		if (err != nil) {log.Fatal(err)}
 	}
 
 	err = huh.NewConfirm().
 		Title("Enable strict JSON?").
-		Description("When enabled, TesserPack will always assume all .json files are pure JSON without comments.\nBut Minecraft Bedrock Edition can read JSON with comments.\nIt will potentially increase optimization performance.").
+		Description("When enabled, TesserPack will always assume all .json files are pure JSON without comments.\nThis is optional since Minecraft Bedrock Edition can read JSON with comments.\nBut, it will potentially make png JSON optimization faster.").
 		Value(&conf.Compiler.JSON.Strict).
 		Run()
 	logFatalOnErr()
@@ -125,15 +108,53 @@ func ConfigGen() {
 	Run()
 	logFatalOnErr()
 	conf.IgnoreGlob = strings.Split(ignoreGlobPatterns, "\n")
+}
+
+func ConfigGen(doCreateRecommended bool) {
+	conf := &types.TesserPackConfig{
+		Compiler: types.CompilerConfig{
+			JSON: types.JSONConfig{
+				Strict: false,
+			},
+			PNG: types.PNGConfig{
+				Quality: 100,
+				CompressLevel: 9,
+				Effort: 10,
+			},
+			JPG: types.JPGConfig{
+				Quality: 100,
+			},
+			Cache: true,
+		},
+		IgnoreGlob: []string{
+			"node_modules/",
+			".git/",
+			".vscode/",
+			".github/",
+		},
+	}
+
+	if _, err := os.Stat(".tesserpackrc"); !os.IsNotExist(err) {
+		log.Fatalf(".tesserpackrc already exists in your working directory.")
+	}
+
+	if (!doCreateRecommended) {
+		configGenPrompt(conf)
+	}
 
 	conf.IgnoreGlob = slices.DeleteFunc(conf.IgnoreGlob, func(elm string) bool {
 		return elm == ""
 	})
 
 	// holy crap, minecraft movie reference
-	jsonMomoa, err := json.MarshalIndent(conf, "", "  ")
-	logFatalOnErr()
+	confJsonMomoa, err := json.MarshalIndent(conf, "", "  ")
+	if (err != nil) {
+		log.Fatal(err)
+	}
 
-	log.Info("", "content", string(jsonMomoa))
+	log.Info("", "content", string(confJsonMomoa))
+
+	os.WriteFile(".tesserpackrc", confJsonMomoa, 0777)
+
 	log.Info(".tesserpackrc is now created in your working directory!")
 }
