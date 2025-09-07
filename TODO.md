@@ -9,6 +9,7 @@
 - [ ] Config
 - [x] (Not so) Proper error checking
 - [ ] v0 GUI w/ wails
+- [ ] Full Refactor for v1
 
 ### After v1.0
 
