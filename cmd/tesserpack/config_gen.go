@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"tesserpack/internal/helpers/config"
 	"tesserpack/internal/types"
 
 	"github.com/charmbracelet/huh"
@@ -61,13 +62,13 @@ func configGenPrompt(conf *types.TesserPackConfig) {
 	err = safeIntInput(
 		"PNG Compression Level", 
 		"Higher levels will result in better optimization in images.", 
-		&conf.Compiler.PNG.CompressLevel, 0, 9)
+		&conf.Compiler.PNG.Compression, 0, 9)
 	logFatalOnErr()
 
 	err = safeIntInput(
 		"PNG Quality Level", 
 		"Higher levels will make images more accurate but higher file size.", 
-		&conf.Compiler.PNG.Quality, 1, 100)
+		&conf.Compiler.PNG.Q, 1, 100)
 	logFatalOnErr()
 
 	err = safeIntInput(
@@ -79,7 +80,7 @@ func configGenPrompt(conf *types.TesserPackConfig) {
 	err = safeIntInput(
 		"JPG Quality Level", 
 		"Higher levels will make images more accurate but higher file size.", 
-		&conf.Compiler.JPG.Quality, 1, 100)
+		&conf.Compiler.JPG.Q, 1, 100)
 	logFatalOnErr()
 
 	err = huh.NewConfirm().
@@ -111,35 +112,14 @@ func configGenPrompt(conf *types.TesserPackConfig) {
 }
 
 func ConfigGen(doCreateRecommended bool) {
-	conf := &types.TesserPackConfig{
-		Compiler: types.CompilerConfig{
-			JSON: types.JSONConfig{
-				Strict: false,
-			},
-			PNG: types.PNGConfig{
-				Quality: 100,
-				CompressLevel: 9,
-				Effort: 10,
-			},
-			JPG: types.JPGConfig{
-				Quality: 100,
-			},
-			Cache: true,
-		},
-		IgnoreGlob: []string{
-			"node_modules/",
-			".git/",
-			".vscode/",
-			".github/",
-		},
-	}
+	conf := config.NewDefault()
 
 	if _, err := os.Stat(".tesserpackrc.json5"); !os.IsNotExist(err) {
 		log.Fatalf(".tesserpackrc.json5 already exists in your working directory.")
 	}
 
 	if (!doCreateRecommended) {
-		configGenPrompt(conf)
+		configGenPrompt(&conf)
 	}
 
 	conf.IgnoreGlob = slices.DeleteFunc(conf.IgnoreGlob, func(elm string) bool {

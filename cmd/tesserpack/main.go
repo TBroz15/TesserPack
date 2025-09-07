@@ -86,14 +86,12 @@ func main() {
 					log.SetLevel(log.DebugLevel)
 				}
 
-				conf := types.Config{
-					InPath:       inPath,
-					OutPath:      outPath,
+				cliDefinedConf := types.Config{
 					IsStrictJSON: isStrictJSON,
 					IsCached:     isCached,
-				} 
+				}
 	
-				err := compiler.StartCompile(&conf)
+				err := compiler.StartCompile(inPath, outPath, )
 	
 				return err
 			},

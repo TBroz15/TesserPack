@@ -5,13 +5,13 @@ type JSONConfig struct {
 }
 
 type PNGConfig struct {
-	CompressLevel byte `json:"compressLevel"`
-	Quality		  byte `json:"quality"`
+	Compression   byte `json:"compressLevel"`
+	Q			  byte `json:"quality"`
 	Effort        byte `json:"effort"`
 }
 
 type JPGConfig struct {
-	Quality		  byte `json:"quality"`
+	Q			  byte `json:"quality"`
 }
 
 type CompilerConfig struct {

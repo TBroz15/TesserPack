@@ -11,16 +11,27 @@ import (
 // I tried it with a simple go func() and wait group, but my PC will crap itself
 // we're going to leave it synchronized first - tuxebro, 2025
 
-var defaultPngOptions = &vips.PngsaveBufferOptions{
+var pngOptions = &vips.PngsaveBufferOptions{
+	Q: 100,
 	Compression: 9,
 	Interlace: false,
-	Effort: 9,
+	Effort: 10,
 }
 
-var defaultJpgOptions = &vips.JpegsaveBufferOptions{
+var jpgOptions = &vips.JpegsaveBufferOptions{
 	Interlace: false,
 	OptimizeCoding: true,
 	OptimizeScans: true,
+}
+
+func SetPngOptions(config *types.PNGConfig) {
+	pngOptions.Q = int(config.Q)
+	pngOptions.Compression = int(config.Compression)
+	pngOptions.Effort = int(config.Effort)
+}
+
+func SetJpgOptions(config *types.JPGConfig) {
+	jpgOptions.Q = int(config.Q)
 }
 
 var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, _ *sync.WaitGroup) (processedData []byte, err error) {
@@ -31,7 +42,7 @@ var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFil
 	defer img.Close()
 
 
-	buf, err := img.PngsaveBuffer(defaultPngOptions)
+	buf, err := img.PngsaveBuffer(pngOptions)
 
 	if err != nil {
 		return nil, err
@@ -51,7 +62,7 @@ var CompressJPG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFil
 	}
 	defer img.Close()
 
-	buf, err := img.JpegsaveBuffer(defaultJpgOptions)
+	buf, err := img.JpegsaveBuffer(jpgOptions)
 
 	if err != nil {
 		return nil, err
