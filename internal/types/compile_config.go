@@ -1,6 +1,6 @@
 package types
 
-type Config struct {
+type CliDefinedConfig struct {
 	IsStrictJSON bool
 	IsCached     bool
 }

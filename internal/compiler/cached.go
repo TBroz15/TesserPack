@@ -16,7 +16,7 @@ func Cached(
 	outFile string,
 	ext string,
 	processor types.ProcessorFunc,
-	conf *types.Config,
+	conf *types.CompilerConfig,
 	waitGroup *sync.WaitGroup,
 	basePath string) {
 

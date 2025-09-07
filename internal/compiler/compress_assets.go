@@ -34,7 +34,7 @@ func SetJpgOptions(config *types.JPGConfig) {
 	jpgOptions.Q = int(config.Q)
 }
 
-var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, _ *sync.WaitGroup) (processedData []byte, err error) {
+var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig, _ *sync.WaitGroup) (processedData []byte, err error) {
 	img, err := vips.NewPngloadBuffer(*data, nil)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFil
 	return buf, nil
 }
 
-var CompressJPG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, _ *sync.WaitGroup) (processedData []byte, err error) {
+var CompressJPG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig, _ *sync.WaitGroup) (processedData []byte, err error) {
 	img, err := vips.NewJpegloadBuffer(*data, nil)
 	if err != nil {
 		return nil, err

@@ -20,7 +20,7 @@ import (
 	"sync"
 )
 
-func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Config) (error) {
+func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.TesserPackConfig) (error) {
 	log.Infof("Compiling \"%v\"", originalInPath)
 
 	waitGroup := sync.WaitGroup{}
@@ -76,7 +76,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 	operTime.walkAndSort = time.Since(timeNow)
 
 	process := Cached // caching is enabled by default
-	if (!conf.IsCached) {
+	if (!conf.Compiler.Cache) {
 		process = NonCached
 	}
 
@@ -89,7 +89,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 
 		jsonExt := filepath.Ext(srcFile)
 
-		go process(srcFile, outFile, jsonExt, StripJSON, conf, &waitGroup, inPath)
+		go process(srcFile, outFile, jsonExt, StripJSON, &conf.Compiler, &waitGroup, inPath)
 	}
 
 	for _, LANGFile := range sortedFiles.LANG {
@@ -98,7 +98,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		srcFile := path.Join(inPath, LANGFile)
 		outFile := path.Join(tempPackDir, LANGFile)
 
-		go process(srcFile, outFile, ".lang", StripLANG, conf, &waitGroup, inPath)
+		go process(srcFile, outFile, ".lang", StripLANG, &conf.Compiler, &waitGroup, inPath)
 	}
 
 	// copy the uncompiled files
@@ -126,7 +126,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		srcFile := path.Join(inPath, PNGFile)
 		outFile := path.Join(tempPackDir, PNGFile)
 
-		process(srcFile, outFile, ".png", CompressPNG, conf, nil, inPath)
+		process(srcFile, outFile, ".png", CompressPNG, &conf.Compiler, nil, inPath)
 	}
 	operTime.png = time.Since(timeNow)
 
@@ -137,7 +137,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		srcFile := path.Join(inPath, JPGFile)
 		outFile := path.Join(tempPackDir, JPGFile)
 
-		process(srcFile, outFile, ".jpg", CompressJPG, conf, nil, inPath)
+		process(srcFile, outFile, ".jpg", CompressJPG, &conf.Compiler, nil, inPath)
 	}
 	operTime.jpeg = time.Since(timeNow)
 

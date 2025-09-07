@@ -17,7 +17,7 @@ import (
 	"github.com/titanous/json5"
 )
 
-var StripJSON types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.Config, waitGroup *sync.WaitGroup) (processedData []byte, err error) {
+var StripJSON types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig, waitGroup *sync.WaitGroup) (processedData []byte, err error) {
 	if (waitGroup != nil) {
 		defer waitGroup.Done()
 	}
@@ -30,7 +30,7 @@ var StripJSON types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile 
 	var out []byte
 
 	switch {
-	case jsonExt == ".jsonc" || (jsonExt == ".json" && !conf.IsStrictJSON):
+	case jsonExt == ".jsonc" || (jsonExt == ".json" && !conf.JSON.Strict):
 		strippedComments := jsonc.ToJSONInPlace(*data)
 		result := new(bytes.Buffer)
 		err = json.Compact(result, strippedComments)

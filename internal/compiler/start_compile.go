@@ -8,7 +8,9 @@ import (
 	"strings"
 	"sync"
 	"tesserpack/internal/helpers"
+	"tesserpack/internal/helpers/config"
 	"tesserpack/internal/helpers/instancechecker"
+	"tesserpack/internal/types"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -16,7 +18,7 @@ import (
 )
 
 // Do some preparation before compilation
-func StartCompile(inPath, outPath string) error {
+func StartCompile(inPath, outPath string, cliConf types.CliDefinedConfig) error {
 	timeStart := time.Now()
 	defer func (){
 		log.Debugf("Total Compile Time: %v", time.Since(timeStart))
@@ -62,11 +64,13 @@ func StartCompile(inPath, outPath string) error {
 
 	instanceChecker.CheckLock()
 	defer instanceChecker.Unlock()
+
+	conf := config.ReadConf(inPath)
 	
 	// If user is trying to compile a dir
 
 	if (inPathStat.IsDir()) {
-		Compile(inPathAbs, inPathAbs, outPathAbs, tempPackDir, conf)
+		Compile(inPathAbs, inPathAbs, outPathAbs, tempPackDir, &conf)
 
 		os.RemoveAll(tempPackDir)
 		return nil
@@ -91,7 +95,7 @@ func StartCompile(inPath, outPath string) error {
 
 	log.Info("Zip file successfully extracted.")
 
-	Compile(tempUnzippedPackDir, inPathAbs, outPathAbs, tempPackDir, conf)
+	Compile(tempUnzippedPackDir, inPathAbs, outPathAbs, tempPackDir, &conf)
 
 	waitGroup := sync.WaitGroup{}
 
