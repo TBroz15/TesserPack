@@ -74,6 +74,12 @@ func main() {
 					Usage:    "Sets logs to debug level. Don't enable, if you don't want to bomb your terminal with info.",
 					Required: false,
 				},
+				&cli.BoolFlag{
+					Name:     "config",
+					Aliases:  []string{"c"},
+					Usage:    "Specify the path to your configuration. Useful for recompiling .mcpack files. ",
+					Required: false,
+				},
 			},
 			Action: func(ctx context.Context, cmd *cli.Command) error {
 				inPath       := cmd.String("in")
