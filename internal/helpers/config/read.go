@@ -10,11 +10,15 @@ import (
 	"github.com/titanous/json5"
 )
 
-func ReadConf(inPath string) types.TesserPackConfig {
+func ReadConf(inPath, confPath string) types.TesserPackConfig {
 	conf := NewDefault()
 
-	confFilePath := path.Join(inPath, ".tesserpackrc")
-	confFileCont, err := os.ReadFile(confFilePath)
+	if confPath == "" {
+		confPath = path.Join(inPath, ".tesserpackrc.json5")
+	}
+
+	confFileCont, err := os.ReadFile(confPath)
+
 	if err != nil {
 		log.Warn("Can't read config, using default config.", "err", err)
 		return conf
