@@ -13,6 +13,7 @@ import (
 func ReadConf(inPath, confPath string) types.TesserPackConfig {
 	conf := NewDefault()
 
+	// if user did not define confPath via CLI
 	if confPath == "" {
 		confPath = path.Join(inPath, ".tesserpackrc.json5")
 	}
@@ -27,14 +28,12 @@ func ReadConf(inPath, confPath string) types.TesserPackConfig {
 	var confFileJSON types.TesserPackConfig
 	err = json5.Unmarshal(confFileCont, confFileJSON)
 	if err != nil {
-		log.Error("Failed to parse config, using default config.", "err", err)
-		return conf
+		log.Fatal("Failed to parse config.", "err", err)
 	}
 
 	err = mergo.Merge(conf, confFileJSON)
 	if err != nil {
-		log.Error("Failed to merge user and default config, using default config.", "err", err, "messageFromTuxeBro", "That should not happen.")
-		return conf
+		log.Fatal("Failed to merge default and user defined config.", "err", err, "messageFromTuxeBro", "That should not happen.")
 	}
 
 	return conf

@@ -10,7 +10,6 @@ import (
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/helpers/config"
 	"tesserpack/internal/helpers/instancechecker"
-	"tesserpack/internal/types"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -18,7 +17,8 @@ import (
 )
 
 // Do some preparation before compilation
-func StartCompile(inPath, outPath string, cliConf types.CliDefinedConfig) error {
+func StartCompile(inPath, outPath, confPath string) error {
+
 	timeStart := time.Now()
 	defer func (){
 		log.Debugf("Total Compile Time: %v", time.Since(timeStart))
@@ -65,7 +65,7 @@ func StartCompile(inPath, outPath string, cliConf types.CliDefinedConfig) error 
 	instanceChecker.CheckLock()
 	defer instanceChecker.Unlock()
 
-	conf := config.ReadConf(inPath)
+	conf := config.ReadConf(inPath, confPath)
 	
 	// If user is trying to compile a dir
 

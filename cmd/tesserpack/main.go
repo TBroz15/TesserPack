@@ -10,7 +10,6 @@ import (
 	"tesserpack/internal/compiler"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/helpers/cache"
-	"tesserpack/internal/types"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
@@ -84,20 +83,22 @@ func main() {
 			Action: func(ctx context.Context, cmd *cli.Command) error {
 				inPath       := cmd.String("in")
 				outPath      := cmd.String("out")
+				confPath     := cmd.String("config")
+
 				isStrictJSON := cmd.Bool("strict-json")
 				isCached	 := !cmd.Bool("disable-cache")
+
+				if isStrictJSON || isCached {
+					log.Warn("--strict-json and --disable-cache is deprecated. Create a config via 'tesserpack init' and use --config instead.")
+				}
+				
 				doDebugMode	 := cmd.Bool("debug")
 
 				if (doDebugMode) {
 					log.SetLevel(log.DebugLevel)
 				}
-
-				cliDefinedConf := types.CliDefinedConfig{
-					IsStrictJSON: isStrictJSON,
-					IsCached:     isCached,
-				}
 	
-				err := compiler.StartCompile(inPath, outPath, cliDefinedConf)
+				err := compiler.StartCompile(inPath, outPath, confPath)
 	
 				return err
 			},
