@@ -85,15 +85,11 @@ func main() {
 				outPath      := cmd.String("out")
 				confPath     := cmd.String("config")
 
-				isStrictJSON := cmd.Bool("strict-json")
-				isCached	 := !cmd.Bool("disable-cache")
-
-				if isStrictJSON || isCached {
+				if cmd.Bool("strict-json") || cmd.Bool("disable-cache") {
 					log.Warn("--strict-json and --disable-cache is deprecated. Create a config via 'tesserpack init' and use --config instead.")
 				}
 				
-				doDebugMode	 := cmd.Bool("debug")
-
+				doDebugMode	:= cmd.Bool("debug")
 				if (doDebugMode) {
 					log.SetLevel(log.DebugLevel)
 				}
