@@ -115,34 +115,39 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 
 	waitGroup.Wait()
 	operTime.jsonLangCpy = time.Since(timeNow)
-
 	log.Info("Finished optimizing JSON & LANG files.")
 	
 	timeNow = time.Now()
 	for _, PNGFile := range sortedFiles.PNG {
+		waitGroup.Add(1)
+
 		srcFile := path.Join(inPath, PNGFile)
 		outFile := path.Join(tempPackDir, PNGFile)
 
-		p.Process(srcFile, outFile, ".png", CompressPNG)
+		go p.Process(srcFile, outFile, ".png", CompressPNG)
 	}
-	operTime.png = time.Since(timeNow)
 
+	waitGroup.Wait()
+	operTime.png = time.Since(timeNow)
 	log.Info("Finished optimizing PNG files.")
 
 	timeNow = time.Now()
 	for _, JPGFile := range sortedFiles.JPG {
+		waitGroup.Add(1)
+
 		srcFile := path.Join(inPath, JPGFile)
 		outFile := path.Join(tempPackDir, JPGFile)
 
-		p.Process(srcFile, outFile, ".jpg", CompressJPG)
+		go p.Process(srcFile, outFile, ".jpg", CompressJPG)
 	}
-	operTime.jpeg = time.Since(timeNow)
 
+	waitGroup.Wait()
+	operTime.jpeg = time.Since(timeNow)
 	log.Info("Finished optimizing JPEG files.")
 
 	log.Infof("Compressing pack to \"%v\"", path.Base(outPath))
-
 	timeNow = time.Now()
+
 	shardedCompiledFiles := shardmap.New[string, os.FileInfo](len(files))
 	
 	err = fastwalk.Walk(&fastWalkConf, tempPackDir, func(compiledFile string, entry fs.DirEntry, err error) error {

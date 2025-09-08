@@ -26,9 +26,7 @@ func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath s
 }
 
 func (c *Cached) Process(srcFile, outFile, ext string, processor types.ProcessorFunc) {
-	if (c.waitGroup != nil) {
-		defer c.waitGroup.Done()
-	}
+	defer c.waitGroup.Done()
 
 	baseFile, err := filepath.Rel(c.basePath, srcFile)
 	if err != nil {
