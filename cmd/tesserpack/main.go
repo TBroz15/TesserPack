@@ -9,7 +9,6 @@ import (
 
 	"tesserpack/internal/compiler"
 	"tesserpack/internal/helpers"
-	"tesserpack/internal/helpers/cache"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
@@ -126,7 +125,7 @@ func main() {
 			Action: func(ctx context.Context, c *cli.Command) error {
 				log.Info("Clearing cache files...")
 
-				err := cache.ClearCacheDir()
+				err := helpers.ClearCacheDir()
 				if (err != nil) {return err}
 
 				log.Info("Successfully cleared cache files.")

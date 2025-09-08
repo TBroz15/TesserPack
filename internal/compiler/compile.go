@@ -8,7 +8,6 @@ import (
 	"path"
 	"path/filepath"
 	"tesserpack/internal/helpers"
-	"tesserpack/internal/helpers/cache"
 	"tesserpack/internal/types"
 	"time"
 
@@ -76,6 +75,9 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 	operTime.walkAndSort = time.Since(timeNow)
 
 	p := NewCached(&conf.Compiler, &waitGroup, inPath)
+
+	p.ReadLists()
+	defer p.SaveLists()
 
 	timeNow = time.Now()
 	for _, JSONFile := range sortedFiles.JSON {
@@ -202,8 +204,6 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 				"\nJPG Optimization", operTime.jpeg,
 				"\nWalk Optimized Pack and Get FileInfo", operTime.walkAndInfo,
 				"\nCompression", operTime.compression)
-
-	cache.SaveLists()
 
 	return nil
 }
