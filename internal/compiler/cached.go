@@ -11,20 +11,26 @@ import (
 	"github.com/charmbracelet/log"
 )
 
-func Cached(
-	srcFile string,
-	outFile string,
-	ext string,
-	processor types.ProcessorFunc,
-	conf *types.CompilerConfig,
-	waitGroup *sync.WaitGroup,
-	basePath string) {
+type Cached struct {
+	conf *types.CompilerConfig
+	waitGroup *sync.WaitGroup
+	basePath string
+}
 
-	if (waitGroup != nil) {
-		defer waitGroup.Done()
+func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath string) Cached {
+	return Cached{
+		conf: conf,
+		waitGroup: waitGroup,
+		basePath: basePath,
+	}
+}
+
+func (c *Cached) Process(srcFile, outFile, ext string, processor types.ProcessorFunc) {
+	if (c.waitGroup != nil) {
+		defer c.waitGroup.Done()
 	}
 
-	baseFile, err := filepath.Rel(basePath, srcFile)
+	baseFile, err := filepath.Rel(c.basePath, srcFile)
 	if err != nil {
 		log.Error("Failed to get relative file path", "err", err, "file", srcFile,)
 		return
@@ -54,7 +60,7 @@ func Cached(
 
 	if cacheExist {return}
 
-	processedData, err := processor(&fileContent, &outFile, &srcFile, conf, nil)
+	processedData, err := processor(&fileContent, &outFile, &srcFile, c.conf, nil)
 	if (err != nil) {
 		log.Error("Failed to process file. Copying the original instead", "err", err, "file", baseFile)
 

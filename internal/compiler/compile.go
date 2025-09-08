@@ -75,10 +75,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 	sortedFiles := helpers.SortFiles(&files, tempPackDir)
 	operTime.walkAndSort = time.Since(timeNow)
 
-	process := Cached // caching is enabled by default
-	if (!conf.Compiler.Cache) {
-		process = NonCached
-	}
+	p := NewCached(&conf.Compiler, &waitGroup, inPath)
 
 	timeNow = time.Now()
 	for _, JSONFile := range sortedFiles.JSON {
@@ -89,7 +86,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 
 		jsonExt := filepath.Ext(srcFile)
 
-		go process(srcFile, outFile, jsonExt, StripJSON, &conf.Compiler, &waitGroup, inPath)
+		go p.Process(srcFile, outFile, jsonExt, StripJSON)
 	}
 
 	for _, LANGFile := range sortedFiles.LANG {
@@ -98,7 +95,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 		srcFile := path.Join(inPath, LANGFile)
 		outFile := path.Join(tempPackDir, LANGFile)
 
-		go process(srcFile, outFile, ".lang", StripLANG, &conf.Compiler, &waitGroup, inPath)
+		go p.Process(srcFile, outFile, ".lang", StripJSON)
 	}
 
 	// copy the uncompiled files
@@ -126,7 +123,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 		srcFile := path.Join(inPath, PNGFile)
 		outFile := path.Join(tempPackDir, PNGFile)
 
-		process(srcFile, outFile, ".png", CompressPNG, &conf.Compiler, nil, inPath)
+		p.Process(srcFile, outFile, ".png", CompressPNG)
 	}
 	operTime.png = time.Since(timeNow)
 
@@ -137,7 +134,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 		srcFile := path.Join(inPath, JPGFile)
 		outFile := path.Join(tempPackDir, JPGFile)
 
-		process(srcFile, outFile, ".jpg", CompressJPG, &conf.Compiler, nil, inPath)
+		p.Process(srcFile, outFile, ".jpg", CompressJPG)
 	}
 	operTime.jpeg = time.Since(timeNow)
 
