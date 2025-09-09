@@ -10,20 +10,24 @@ import (
 	"github.com/charmbracelet/log"
 )
 
-func NonCached(
-	srcFile string,
-	outFile string,
-	ext string,
-	processor types.ProcessorFunc,
-	conf *types.CompilerConfig,
-	waitGroup *sync.WaitGroup,
-	basePath string) {
+type NonCached struct {
+	conf *types.CompilerConfig
+	waitGroup *sync.WaitGroup
+	basePath string
+}
 
-	if (waitGroup != nil) {
-		defer waitGroup.Done()
+func NewNonCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath string) *NonCached {
+	return &NonCached{
+		conf: 	   conf,
+		waitGroup: waitGroup,
+		basePath:  basePath,
 	}
+}
 
-	baseFile, err := filepath.Rel(basePath, srcFile)
+func (c* NonCached) Process(srcFile, outFile, ext string, processor types.ProcessorFunc) {
+	defer c.waitGroup.Done()
+
+	baseFile, err := filepath.Rel(c.basePath, srcFile)
 	if err != nil {
 		log.Error("Failed to get relative file path", "err", err, "file", srcFile,)
 		return
@@ -35,7 +39,7 @@ func NonCached(
 		return
 	}
 
-	processedData, err := processor(&fileContent, &outFile, &srcFile, conf, nil)
+	processedData, err := processor(&fileContent, &outFile, &srcFile, c.conf, nil)
 	if err != nil {
 		log.Error("Failed to process file. Copying the original instead", "err", err, "file", baseFile)
 	}
@@ -53,3 +57,6 @@ func NonCached(
 		log.Error("Failed to write file", "err", err, "file", baseFile)
 	}
 }
+
+func (c* NonCached) ReadLists() {}
+func (c* NonCached) SaveLists() {}

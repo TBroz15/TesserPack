@@ -74,7 +74,14 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 	sortedFiles := helpers.SortFiles(&files, tempPackDir)
 	operTime.walkAndSort = time.Since(timeNow)
 
-	p := NewCached(&conf.Compiler, &waitGroup, inPath)
+	var p types.Processor
+
+	if conf.Compiler.Cache {
+		p = NewCached(&conf.Compiler, &waitGroup, inPath)
+	} else {
+		p = NewNonCached(&conf.Compiler, &waitGroup, inPath)
+	}
+
 
 	p.ReadLists()
 	defer p.SaveLists()

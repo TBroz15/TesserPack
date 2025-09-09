@@ -28,7 +28,7 @@ type Cached struct {
 	skipList      *shardmap.Map[string, *bool]
 }
 
-func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath string) Cached {
+func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath string) *Cached {
 	cacheDir 	  := path.Join(helpers.TempDir, "cache")
 
 	cacheListFile := path.Join(cacheDir, ".cache_list")
@@ -49,7 +49,7 @@ func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath s
 		skipListFile:  skipListFile,
 	}
 
-	return cachedProc
+	return &cachedProc
 }
 
 func (c *Cached) Process(srcFile, outFile, ext string, processor types.ProcessorFunc) {
