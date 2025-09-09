@@ -24,15 +24,17 @@ func ReadConf(inPath, confPath string) types.TesserPackConfig {
 		return conf
 	}
 
+	messageFromTuxeBro := "That should not happen. If it does, report to me!"
+
 	var confFileJSON types.TesserPackConfig
-	err = json5.Unmarshal(confFileCont, confFileJSON)
+	err = json5.Unmarshal(confFileCont, &confFileJSON)
 	if err != nil {
-		log.Fatal("Failed to parse config.", "err", err)
+		log.Fatal("Failed to parse config.", "err", err, "messageFromTuxeBro", messageFromTuxeBro)
 	}
 
-	err = mergo.Merge(conf, confFileJSON)
+	err = mergo.Merge(&conf, confFileJSON)
 	if err != nil {
-		log.Fatal("Failed to merge default and user defined config.", "err", err, "messageFromTuxeBro", "That should not happen.")
+		log.Fatal("Failed to merge default and user defined config.", "err", err, "messageFromTuxeBro", messageFromTuxeBro)
 	}
 
 	return conf

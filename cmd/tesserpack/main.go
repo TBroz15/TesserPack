@@ -72,7 +72,7 @@ func main() {
 					Usage:    "Sets logs to debug level. Don't enable, if you don't want to bomb your terminal with info.",
 					Required: false,
 				},
-				&cli.BoolFlag{
+				&cli.StringFlag{
 					Name:     "config",
 					Aliases:  []string{"c"},
 					Usage:    "Specify the path to your configuration. Useful for recompiling .mcpack files. ",
