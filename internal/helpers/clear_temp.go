@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"errors"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -9,12 +8,11 @@ import (
 	"sync"
 
 	"github.com/charlievieth/fastwalk"
+	"github.com/charmbracelet/log"
 )
 
-func ClearTemp() error {
+func ClearTemp() {
 	wg := sync.WaitGroup{}
-	// Use a buffered channel to avoid goroutine blocking
-	errorChan := make(chan error, 100)
 	
 	fastWalkConf := fastwalk.Config{
 		Follow:  true,
@@ -23,7 +21,11 @@ func ClearTemp() error {
 	}
 
 	err := fastwalk.Walk(&fastWalkConf, TempDir, func(path string, d fs.DirEntry, err error) error {
-		if err != nil {return err}
+		if err != nil {
+			log.Error(err)
+			return nil
+		}
+
 		if (!d.IsDir()) {return nil}
 		
 		base := filepath.Base(path)
@@ -33,22 +35,17 @@ func ClearTemp() error {
 		wg.Add(1)
 		go func(path string) {
 			defer wg.Done()
-			errorChan <- os.RemoveAll(path)
+
+			err := os.RemoveAll(path)
+			if err != nil {
+				log.Error(err)
+			}
 		}(path)
 
 		return nil
 	})
 
-	wg.Wait()
-	close(errorChan)
-
-	var errs []error
-
-	for err := range errorChan {
-		errs = append(errs, err)
+	if err != nil {
+		log.Error(err)
 	}
-
-	errs = append(errs, err) // append fastwalk's error
-
-	return errors.Join(errs...)
 }

@@ -110,8 +110,7 @@ func main() {
 			Action: func(ctx context.Context, c *cli.Command) error {
 				log.Info("Clearing temporary directories...")
 
-				err := helpers.ClearTemp()
-				if (err != nil) {return err}
+				helpers.ClearTemp()
 
 				log.Info("Successfully cleared temporary directories.")
 
