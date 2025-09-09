@@ -8,7 +8,6 @@ import (
 	"path"
 	"path/filepath"
 	"tesserpack/internal/helpers"
-	"tesserpack/internal/helpers/cache"
 	"tesserpack/internal/types"
 	"time"
 
@@ -20,7 +19,7 @@ import (
 	"sync"
 )
 
-func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Config) (error) {
+func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.TesserPackConfig) (error) {
 	log.Infof("Compiling \"%v\"", originalInPath)
 
 	waitGroup := sync.WaitGroup{}
@@ -75,10 +74,17 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 	sortedFiles := helpers.SortFiles(&files, tempPackDir)
 	operTime.walkAndSort = time.Since(timeNow)
 
-	process := Cached // caching is enabled by default
-	if (!conf.IsCached) {
-		process = NonCached
+	var p types.Processor
+
+	if conf.Compiler.Cache {
+		p = NewCached(&conf.Compiler, &waitGroup, inPath)
+	} else {
+		p = NewNonCached(&conf.Compiler, &waitGroup, inPath)
 	}
+
+
+	p.ReadLists()
+	defer p.SaveLists()
 
 	timeNow = time.Now()
 	for _, JSONFile := range sortedFiles.JSON {
@@ -89,7 +95,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 
 		jsonExt := filepath.Ext(srcFile)
 
-		go process(srcFile, outFile, jsonExt, StripJSON, conf, &waitGroup, inPath)
+		go p.Process(srcFile, outFile, jsonExt, StripJSON)
 	}
 
 	for _, LANGFile := range sortedFiles.LANG {
@@ -98,7 +104,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 		srcFile := path.Join(inPath, LANGFile)
 		outFile := path.Join(tempPackDir, LANGFile)
 
-		go process(srcFile, outFile, ".lang", StripLANG, conf, &waitGroup, inPath)
+		go p.Process(srcFile, outFile, ".lang", StripJSON)
 	}
 
 	// copy the uncompiled files
@@ -118,34 +124,39 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 
 	waitGroup.Wait()
 	operTime.jsonLangCpy = time.Since(timeNow)
-
 	log.Info("Finished optimizing JSON & LANG files.")
 	
 	timeNow = time.Now()
 	for _, PNGFile := range sortedFiles.PNG {
+		waitGroup.Add(1)
+
 		srcFile := path.Join(inPath, PNGFile)
 		outFile := path.Join(tempPackDir, PNGFile)
 
-		process(srcFile, outFile, ".png", CompressPNG, conf, nil, inPath)
+		go p.Process(srcFile, outFile, ".png", CompressPNG)
 	}
-	operTime.png = time.Since(timeNow)
 
+	waitGroup.Wait()
+	operTime.png = time.Since(timeNow)
 	log.Info("Finished optimizing PNG files.")
 
 	timeNow = time.Now()
 	for _, JPGFile := range sortedFiles.JPG {
+		waitGroup.Add(1)
+
 		srcFile := path.Join(inPath, JPGFile)
 		outFile := path.Join(tempPackDir, JPGFile)
 
-		process(srcFile, outFile, ".jpg", CompressJPG, conf, nil, inPath)
+		go p.Process(srcFile, outFile, ".jpg", CompressJPG)
 	}
-	operTime.jpeg = time.Since(timeNow)
 
+	waitGroup.Wait()
+	operTime.jpeg = time.Since(timeNow)
 	log.Info("Finished optimizing JPEG files.")
 
 	log.Infof("Compressing pack to \"%v\"", path.Base(outPath))
-
 	timeNow = time.Now()
+
 	shardedCompiledFiles := shardmap.New[string, os.FileInfo](len(files))
 	
 	err = fastwalk.Walk(&fastWalkConf, tempPackDir, func(compiledFile string, entry fs.DirEntry, err error) error {
@@ -200,8 +211,6 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Co
 				"\nJPG Optimization", operTime.jpeg,
 				"\nWalk Optimized Pack and Get FileInfo", operTime.walkAndInfo,
 				"\nCompression", operTime.compression)
-
-	cache.SaveLists()
 
 	return nil
 }

@@ -9,8 +9,6 @@ import (
 
 	"tesserpack/internal/compiler"
 	"tesserpack/internal/helpers"
-	"tesserpack/internal/helpers/cache"
-	"tesserpack/internal/types"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
@@ -74,26 +72,28 @@ func main() {
 					Usage:    "Sets logs to debug level. Don't enable, if you don't want to bomb your terminal with info.",
 					Required: false,
 				},
+				&cli.StringFlag{
+					Name:     "config",
+					Aliases:  []string{"c"},
+					Usage:    "Specify the path to your configuration. Useful for recompiling .mcpack files. ",
+					Required: false,
+				},
 			},
 			Action: func(ctx context.Context, cmd *cli.Command) error {
 				inPath       := cmd.String("in")
 				outPath      := cmd.String("out")
-				isStrictJSON := cmd.Bool("strict-json")
-				isCached	 := !cmd.Bool("disable-cache")
-				doDebugMode	 := cmd.Bool("debug")
+				confPath     := cmd.String("config")
 
+				if cmd.Bool("strict-json") || cmd.Bool("disable-cache") {
+					log.Warn("--strict-json and --disable-cache is deprecated. Create a config via 'tesserpack init' and use --config instead.")
+				}
+				
+				doDebugMode	:= cmd.Bool("debug")
 				if (doDebugMode) {
 					log.SetLevel(log.DebugLevel)
 				}
-
-				conf := types.Config{
-					InPath:       inPath,
-					OutPath:      outPath,
-					IsStrictJSON: isStrictJSON,
-					IsCached:     isCached,
-				} 
 	
-				err := compiler.StartCompile(&conf)
+				err := compiler.StartCompile(inPath, outPath, confPath)
 	
 				return err
 			},
@@ -124,12 +124,30 @@ func main() {
 			Action: func(ctx context.Context, c *cli.Command) error {
 				log.Info("Clearing cache files...")
 
-				err := cache.ClearCacheDir()
+				err := helpers.ClearCacheDir()
 				if (err != nil) {return err}
 
 				log.Info("Successfully cleared cache files.")
 
 				return nil
+			},
+		},
+		{
+			Name: 	 "init",
+			Aliases: []string{"i"},
+			Usage:   "Creates a JSON5 configuration file (.tesserpackrc) through prompts.",
+			Action: func(ctx context.Context, cmd *cli.Command) error {
+				doCreateRecommended := cmd.Bool("recommended")
+				ConfigGen(doCreateRecommended)
+
+				return nil
+			},
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:     "recommended",
+					Aliases:  []string{"r"},
+					Usage:    "Creates the recommended configuration straight away without prompts.",
+				},
 			},
 		},
 	}

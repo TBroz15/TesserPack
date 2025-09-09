@@ -35,5 +35,8 @@ dist/
 
 lib/
 
-tesserpack
+.tesserpackrc.json5
+
+# remove executables
+/tesserpack
 tesserpack.exe

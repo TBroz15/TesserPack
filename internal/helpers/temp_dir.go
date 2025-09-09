@@ -37,3 +37,7 @@ func MkTempPackDir(basePath string) (string, error) {
 
 	return tempPackDir, nil
 }
+
+func ClearCacheDir() (error) {
+	return os.RemoveAll(path.Join(TempDir, "cache"))
+}

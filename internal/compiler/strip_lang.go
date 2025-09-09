@@ -2,18 +2,13 @@ package compiler
 
 import (
 	"bytes"
-	"sync"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/types"
 )
 
 // TODO: try to use string builder and see if it is more optimized
 
-var StripLANG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, _ *types.Config, waitGroup *sync.WaitGroup) (processedData []byte, err error) {
-	if waitGroup != nil {
-		defer waitGroup.Done()
-	}
-
+var StripLANG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, _ *types.CompilerConfig) (processedData []byte, err error) {
 	helpers.RemoveBOM(data)
 
 	// uh oh, i use mr. gpt to optimize my code further in seconds
