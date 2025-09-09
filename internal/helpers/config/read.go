@@ -20,8 +20,9 @@ func ReadConf(inPath, confPath string) types.TesserPackConfig {
 	}
 
 	confFileCont, err := os.ReadFile(confPath)
-	if err != nil {
-		log.Warn("Can't read config, using default config.", "err", err)
+	if err != nil && confPath != "" {
+		log.Fatal("Failed to read config.", "err", err)
+	} else if err != nil {
 		return conf
 	}
 
