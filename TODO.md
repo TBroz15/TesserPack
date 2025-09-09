@@ -11,6 +11,7 @@
 - [ ] v0 GUI w/ wails
 - [ ] Full Refactor for v1
 - [ ] Github Wiki for Effective Usage 
+- [ ] Add Tests
 
 ### After v1.0
 
