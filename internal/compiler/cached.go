@@ -67,9 +67,9 @@ func (c *Cached) Process(srcFile, outFile, ext string, processor types.Processor
 		return
 	}
 
-	hashFile := c.getHashFile(&fileContent, ext)
+	hashKey := c.getHashKey(&fileContent, ext)
 
-	isSkipped, err := c.checkSkip(hashFile, srcFile, outFile)
+	isSkipped, err := c.checkSkip(hashKey, srcFile, outFile)
 	if err != nil {
 		log.Error("Failed to read cache", "err", err, "file", baseFile)
 		return
@@ -77,7 +77,7 @@ func (c *Cached) Process(srcFile, outFile, ext string, processor types.Processor
 
 	if (isSkipped) {return}
 	
-	cacheExist, err := c.tryCopyCache(hashFile, outFile) 
+	cacheExist, err := c.tryCopyCache(hashKey, outFile) 
 	if err != nil {
 		log.Error("Failed to read cache", "err", err, "file", baseFile)
 		return
@@ -98,17 +98,17 @@ func (c *Cached) Process(srcFile, outFile, ext string, processor types.Processor
 
 	// asset processors tend to skip and not include processedData
 	if processedData == nil {
-		c.addToSkipList(hashFile)
+		c.addToSkipList(hashKey)
 		return
 	}
 
-	err = c.saveCache(hashFile, processedData)
+	err = c.saveCache(hashKey, processedData)
 	if err != nil {
 		log.Error("Failed to save cache of file", "err", err, "file", baseFile)
 		return
 	}
 
-	_, err = c.tryCopyCache(hashFile, outFile)
+	_, err = c.tryCopyCache(hashKey, outFile)
 	if err != nil {
 		log.Error("Failed to read cache of file", "err", err, "file", baseFile)
 		return
@@ -125,8 +125,8 @@ func (c *Cached) SaveLists() {
 	saveList(c.skipListFile,  c.skipList)
 }
 
-func (c *Cached) checkSkip(hashFile string, srcFile string, outFile string) (isSkipped bool, err error) {
-	_, isSkipped = c.skipList.Get(hashFile)
+func (c *Cached) checkSkip(hashKey string, srcFile string, outFile string) (isSkipped bool, err error) {
+	_, isSkipped = c.skipList.Get(hashKey)
 	if !isSkipped {return}
 
 	err = helpers.LinkOrCopy(srcFile, outFile)
@@ -137,22 +137,22 @@ func (c *Cached) checkSkip(hashFile string, srcFile string, outFile string) (isS
 	return true, nil
 }
 
-func (c *Cached) getHashFile(data *[]byte, ext string) (string) {
+func (c *Cached) getHashKey(data *[]byte, ext string) (string) {
 	hash := xxhash.Sum64(*data)
 	size := len(*data)
 
 	return fmt.Sprintf("%x-%d%v", hash, size, ext)
 }
 
-func (c *Cached) tryCopyCache(hashFile string, outFile string) (cacheExists bool, err error) {	
-	cacheLock, cacheExists := c.cacheLockList.Get(hashFile)
+func (c *Cached) tryCopyCache(hashKey string, outFile string) (cacheExists bool, err error) {	
+	cacheLock, cacheExists := c.cacheLockList.Get(hashKey)
 	if (!cacheExists) {
 		return false, nil
 	}
 	cacheLock.Lock()
 	defer cacheLock.Unlock()
 
-	err = helpers.LinkOrCopy(path.Join(c.cacheDir, hashFile), outFile)
+	err = helpers.LinkOrCopy(path.Join(c.cacheDir, hashKey), outFile)
 	if (err != nil) {
 		return false, err
 	}
@@ -160,27 +160,27 @@ func (c *Cached) tryCopyCache(hashFile string, outFile string) (cacheExists bool
 	return true, nil
 }
 
-func (c *Cached) addToSkipList(hashFile string) {
-	_, isSkipped := c.skipList.Get(hashFile)
+func (c *Cached) addToSkipList(hashKey string) {
+	_, isSkipped := c.skipList.Get(hashKey)
 	if !isSkipped {
 		trueBool := true
-		c.skipList.Set(hashFile, &trueBool)
+		c.skipList.Set(hashKey, &trueBool)
 		return
 	}
 }
 
-func (c *Cached) saveCache(hashFile string, processedData []byte) error {
-	cacheLock, cacheExists := c.cacheLockList.Get(hashFile)
+func (c *Cached) saveCache(hashKey string, processedData []byte) error {
+	cacheLock, cacheExists := c.cacheLockList.Get(hashKey)
 	if (!cacheExists) {
-		c.cacheLockList.Set(hashFile, &sync.Mutex{})
-		cacheLock1, _ := c.cacheLockList.Get(hashFile)
+		c.cacheLockList.Set(hashKey, &sync.Mutex{})
+		cacheLock1, _ := c.cacheLockList.Get(hashKey)
 		cacheLock = cacheLock1
 		cacheExists = true
 	}
 	cacheLock.Lock()
 	defer cacheLock.Unlock()
 
-	err := os.WriteFile(path.Join(c.cacheDir, hashFile), processedData, 0777)
+	err := os.WriteFile(path.Join(c.cacheDir, hashKey), processedData, 0777)
 	return err
 }
 
