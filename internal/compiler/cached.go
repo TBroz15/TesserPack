@@ -6,11 +6,12 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/types"
 
-	"github.com/cespare/xxhash"
+	"github.com/cespare/xxhash/v2"
 	"github.com/charmbracelet/log"
 	"github.com/phuslu/shardmap"
 )
@@ -31,13 +32,19 @@ type Cached struct {
 	skipList      *shardmap.Map[string, *bool]
 }
 
+func u64ToHexFixed(v uint64) string {
+    buf := make([]byte, 0, 16)
+    buf = strconv.AppendUint(buf, v, 16)
+    return string(buf)
+}
+
 func createConfHash(conf interface{}) string {
 	out, err := json.Marshal(conf)
 	if (err != nil) {
 		log.Fatal("Cannot create config hash! Please report this issue. TesserPack does not know how to handle this error, neither the creator can!", "err", err)
 	}
-	
-	return fmt.Sprintf("%x", xxhash.Sum64(out))
+
+	return u64ToHexFixed(xxhash.Sum64(out))
 }
 
 func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath string) *Cached {
@@ -166,7 +173,9 @@ func (c *Cached) getHashKey(data *[]byte, confHash, ext string) (string) {
 	hash := xxhash.Sum64(*data)
 	size := len(*data)
 
-	return fmt.Sprintf("%x-%d-%v%v", hash, size, confHash, ext)
+	return u64ToHexFixed(hash) + 
+			"-" + strconv.Itoa(size) + 
+			"-" + confHash + ext
 }
 
 func (c *Cached) tryCopyCache(hashKey string, outFile string) (cacheExists bool, err error) {	
