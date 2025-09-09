@@ -5,7 +5,6 @@ import (
 	"errors"
 	"path/filepath"
 	"strings"
-	"sync"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/types"
 
@@ -17,11 +16,7 @@ import (
 	"github.com/titanous/json5"
 )
 
-var StripJSON types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig, waitGroup *sync.WaitGroup) (processedData []byte, err error) {
-	if (waitGroup != nil) {
-		defer waitGroup.Done()
-	}
-
+var StripJSON types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig) (processedData []byte, err error) {
 	helpers.RemoveBOM(data)
 
 	jsonExt := filepath.Ext(*srcFile)

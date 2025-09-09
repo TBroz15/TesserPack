@@ -39,7 +39,7 @@ func (c* NonCached) Process(srcFile, outFile, ext string, processor types.Proces
 		return
 	}
 
-	processedData, err := processor(&fileContent, &outFile, &srcFile, c.conf, nil)
+	processedData, err := processor(&fileContent, &outFile, &srcFile, c.conf)
 	if err != nil {
 		log.Error("Failed to process file. Copying the original instead", "err", err, "file", baseFile)
 	}

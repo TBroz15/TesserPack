@@ -36,7 +36,7 @@ func SetJpgOptions(config *types.JPGConfig) {
 
 var m sync.Mutex
 
-var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig, _ *sync.WaitGroup) (processedData []byte, err error) {
+var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig) (processedData []byte, err error) {
 	m.Lock()
 	defer m.Unlock()
 	
@@ -60,7 +60,7 @@ var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFil
 	return buf, nil
 }
 
-var CompressJPG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig, _ *sync.WaitGroup) (processedData []byte, err error) {
+var CompressJPG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig) (processedData []byte, err error) {
 	m.Lock()
 	defer m.Unlock()
 	
