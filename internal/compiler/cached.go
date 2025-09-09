@@ -20,12 +20,24 @@ type Cached struct {
 	waitGroup *sync.WaitGroup
 	basePath string
 
+	pngConfHash string
+	jpgConfHash string
+
 	cacheDir 	  string
 	cacheListFile string
 	skipListFile  string
 
 	cacheLockList *shardmap.Map[string, *sync.Mutex]
 	skipList      *shardmap.Map[string, *bool]
+}
+
+func createConfHash(conf interface{}) string {
+	out, err := json.Marshal(conf)
+	if (err != nil) {
+		log.Fatal("Cannot create config hash! Please report this issue. TesserPack does not know how to handle this error, neither the creator can!", "err", err)
+	}
+	
+	return fmt.Sprintf("%x", xxhash.Sum64(out))
 }
 
 func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath string) *Cached {
@@ -43,6 +55,9 @@ func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath s
 		conf: 	   conf,
 		waitGroup: waitGroup,
 		basePath:  basePath,
+
+		pngConfHash: createConfHash(conf.PNG),
+		jpgConfHash: createConfHash(conf.JPG),
 
 		cacheDir: 	   cacheDir,
 		cacheListFile: cacheListFile,
@@ -67,7 +82,17 @@ func (c *Cached) Process(srcFile, outFile, ext string, processor types.Processor
 		return
 	}
 
-	hashKey := c.getHashKey(&fileContent, ext)
+	confHash := ""
+
+	if (ext == ".png") {
+		confHash = c.pngConfHash
+	}
+
+	if (ext == ".jpg") {
+		confHash = c.jpgConfHash
+	}
+
+	hashKey := c.getHashKey(&fileContent, confHash, ext)
 
 	isSkipped, err := c.checkSkip(hashKey, srcFile, outFile)
 	if err != nil {
@@ -137,11 +162,11 @@ func (c *Cached) checkSkip(hashKey string, srcFile string, outFile string) (isSk
 	return true, nil
 }
 
-func (c *Cached) getHashKey(data *[]byte, ext string) (string) {
+func (c *Cached) getHashKey(data *[]byte, confHash, ext string) (string) {
 	hash := xxhash.Sum64(*data)
 	size := len(*data)
 
-	return fmt.Sprintf("%x-%d%v", hash, size, ext)
+	return fmt.Sprintf("%x-%d-%v%v", hash, size, confHash, ext)
 }
 
 func (c *Cached) tryCopyCache(hashKey string, outFile string) (cacheExists bool, err error) {	
