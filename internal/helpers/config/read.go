@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path"
+	"reflect"
 	"tesserpack/internal/types"
 
 	"dario.cat/mergo"
@@ -10,6 +11,38 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/titanous/json5"
 )
+
+// dear self do not optimize this further. i know the code is trash but this is not the main focus -tuxebro
+func customMerge(dst, src interface{}, useMergo bool) error {
+	if (useMergo) {
+		err := mergo.Merge(dst, src, mergo.WithOverride, mergo.WithTypeCheck)
+		if err != nil {
+			return err
+		}
+	}
+	
+	dstVal := reflect.ValueOf(dst).Elem()
+	srcVal := reflect.ValueOf(src)
+
+	for i := 0; i < dstVal.NumField(); i++ {
+		
+		dstField := dstVal.Field(i)
+		srcField := srcVal.Field(i)
+
+		if dstField.Kind() == reflect.Struct {
+			dstInter := dstField.Addr().Interface()
+			srcInter := srcField.Interface()
+
+			customMerge(dstInter, srcInter, false)
+		}
+
+		if dstField.Kind() == reflect.Bool {
+			dstField.SetBool(srcField.Bool())
+		}
+	}
+
+	return nil
+}
 
 func ReadConf(inPath, confPath string) types.TesserPackConfig {
 	conf := NewDefault()
@@ -34,7 +67,7 @@ func ReadConf(inPath, confPath string) types.TesserPackConfig {
 		log.Fatal("Failed to parse config.", "err", err, "messageFromTuxeBro", messageFromTuxeBro)
 	}
 
-	err = mergo.Merge(&conf, confFileJSON)
+	err = customMerge(&conf, confFileJSON, true)
 	if err != nil {
 		log.Fatal("Failed to merge default and user defined config.", "err", err, "messageFromTuxeBro", messageFromTuxeBro)
 	}
