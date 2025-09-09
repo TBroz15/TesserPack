@@ -7,6 +7,7 @@ import (
 
 	"dario.cat/mergo"
 	"github.com/charmbracelet/log"
+	"github.com/goccy/go-json"
 	"github.com/titanous/json5"
 )
 
@@ -36,6 +37,13 @@ func ReadConf(inPath, confPath string) types.TesserPackConfig {
 	if err != nil {
 		log.Fatal("Failed to merge default and user defined config.", "err", err, "messageFromTuxeBro", messageFromTuxeBro)
 	}
+
+	if (log.GetLevel() == log.DebugLevel) {
+		confByte, _ := json.MarshalIndent(conf, "", "  ")
+
+		log.Debug("Successfully parsed config.", "conf", string(confByte))
+	}
+
 
 	return conf
 }
