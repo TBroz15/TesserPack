@@ -15,6 +15,8 @@ var pngOptions = &vips.PngsaveBufferOptions{
 	Q: 100,
 	Compression: 9,
 	Interlace: false,
+	Palette: true,
+	Keep: vips.KeepNone,
 	Effort: 10,
 }
 
