@@ -180,7 +180,7 @@ func (c *Cached) getHashKey(data *[]byte, confHash, ext string) (string) {
 
 func (c *Cached) tryCopyCache(hashKey string, outFile string) (cacheExists bool, err error) {	
 	cacheLock, cacheExists := c.cacheLockList.Get(hashKey)
-	if (!cacheExists) {
+	if cacheLock == nil && !cacheExists {
 		return false, nil
 	}
 	cacheLock.Lock()
@@ -205,16 +205,21 @@ func (c *Cached) addToSkipList(hashKey string) {
 
 func (c *Cached) saveCache(hashKey string, processedData []byte) error {
 	cacheLock, cacheExists := c.cacheLockList.Get(hashKey)
-	if (!cacheExists) {
-		c.cacheLockList.Set(hashKey, &sync.Mutex{})
-		cacheLock1, _ := c.cacheLockList.Get(hashKey)
-		cacheLock = cacheLock1
-		cacheExists = true
-	}
-	cacheLock.Lock()
-	defer cacheLock.Unlock()
+	if !cacheExists {
+		newLock := &sync.Mutex{}
+		newLock.Lock()
 
-	err := os.WriteFile(path.Join(c.cacheDir, hashKey), processedData, 0777)
+		c.cacheLockList.Set(hashKey, newLock)
+
+		cacheLock = newLock
+		cacheExists = true
+		defer cacheLock.Unlock()
+	} else {
+		cacheLock.Lock()
+		defer cacheLock.Unlock()
+	}
+
+	err := os.WriteFile(path.Join(c.cacheDir, hashKey), processedData, 0644)
 	return err
 }
 
