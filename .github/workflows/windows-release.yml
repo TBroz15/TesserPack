@@ -75,6 +75,7 @@ jobs:
             -Dintrospection=disabled \
             -Dexamples=false \
             -Djpeg=enabled \
+            -Dhighway=enabled \
             -Dpng=enabled \
             -Dimagequant=enabled \
             -Dtiff=disabled \
@@ -82,7 +83,10 @@ jobs:
             -Dheif=disabled \
             -Dpdfium=disabled \
             -Dopenslide=disabled \
-            -Dorc=disabled
+            -Dorc=disabled \
+            -Dexif=disabled \
+            -Dcfitsio=disabled \
+            -Dpangocairo=disabled
 
           meson compile -C build
           meson install -C build
@@ -102,7 +106,8 @@ jobs:
               "libgio-2.0-0.dll",
               "libexpat-1.dll",
               "libarchive-13.dll",
-              "libintl-8.dll"
+              "libintl-8.dll",
+              "libffi-8.dll"
           )
 
           foreach ($dll in $Dlls) {
