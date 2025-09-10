@@ -1,0 +1,102 @@
+name: windows-release
+
+on:
+  push:
+    tags:
+      - 'v*'           # run on git tags like v1.2.3; adjust if you prefer manual dispatch
+  workflow_dispatch:
+    # temporary
+    inputs:
+      branch:
+        description: 'Branch to run'
+        required: true
+        default: 'main' # Or your default branch
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.0'
+
+      - name: Install MSYS2 and MinGW (Windows)
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          cache: true
+          install: >-
+            mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-libvips
+            mingw-w64-x86_64-toolchain 
+            mingw-w64-x86_64-cmake 
+            mingw-w64-x86_64-ninja 
+            mingw-w64-x86_64-meson 
+            mingw-w64-x86_64-git 
+            mingw-w64-x86_64-glib2 
+            mingw-w64-x86_64-highway 
+            mingw-w64-x86_64-libspng 
+            mingw-w64-x86_64-nasm 
+            mingw-w64-x86_64-libpng
+            mingw-w64-x86_64-libimagequant
+
+      - name: Make Temporary Directory
+        shell: msys2 {0}
+        run: |
+          mkdir /tmp
+      
+      - name: Build MozJpeg
+        shell: msys2 {0}
+        run: |
+          cd /tmp
+          git clone https://github.com/mozilla/mozjpeg.git
+          cd mozjpeg
+          mkdir build && cd build
+          cmake -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_INSTALL_PREFIX=$PREFIX ..
+          ninja install
+
+      - name: Build MozJpeg
+        shell: msys2 {0}
+        run: |
+          cd /tmp
+          git clone https://github.com/libvips/libvips.git
+          cd libvips
+
+          meson setup build \
+              --prefix=$PREFIX \
+              --buildtype=release \
+              -Ddeprecated=false \
+              -Dmodules=disabled \
+              -Dintrospection=disabled \
+              -Dexamples=false \
+              -Djpeg=enabled \
+              -Dmozjpeg=enabled \
+              -Dpng=enabled \
+              -Dspng=enabled \
+              -Dimagequant=enabled \
+              -Dhighway=enabled \
+              -Dtiff=disabled \
+              -Dwebp=disabled \
+              -Dheif=disabled \
+              -Dpdfium=disabled \
+              -Dopenslide=disabled \
+              -Dorc=disabled
+
+          meson compile -C build
+          meson install -C build
+
+      - name: wer is my lib bips
+        run: pkg-config --libs --cflags vips
+        shell: msys2 {0}
