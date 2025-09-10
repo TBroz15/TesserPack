@@ -86,6 +86,43 @@ jobs:
 
           meson compile -C build
           meson install -C build
+      
+      - name: Copy DLLs
+        run: |
+          $MSYS_BIN = "D:\a\_temp\msys64\mingw64\bin"
+
+          $Dlls = @(
+              "libvips-42.dll",
+              "libjpeg-62.dll",
+              "libspng.dll",
+              "libimagequant.dll",
+              "libhwy.dll",
+              "libglib-2.0-0.dll",
+              "libgobject-2.0-0.dll",
+              "libgio-2.0-0.dll",
+              "libexpat-1.dll",
+              "libarchive-13.dll",
+              "libintl-8.dll"
+          )
+
+          foreach ($dll in $Dlls) {
+              Copy-Item -Path "$MSYS_BIN\$dll" -Destination "${{ github.workspace }}\bin" -Force
+          }
+
+      - name: Run GoReleaser (Windows)
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          # 'latest', 'nightly', or a semver
+          version: "latest"
+          args: release --config .goreleaser.windows.yaml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CGO_ENABLED: 1
+          CGO_CFLAGS: "-ID:\\a\\_temp\\msys64\\mingw64\\include -ID:\\a\\_temp\\msys64\\mingw64\\include\\glib-2.0 -ID:\\a\\_temp\\msys64\\mingw64\\lib\\glib-2.0\\include"
+          CGO_LDFLAGS: "-LD:\\a\\_temp\\msys64\\mingw64\\lib"
+          PKG_CONFIG_PATH: "${{ github.workspace }}\\vips-dev-8.17\\lib\\pkgconfig"
+          GOEXPERIMENT: "jsonv2"
 
       - name: wer is my lib bips
         run: pkg-config --libs --cflags vips
