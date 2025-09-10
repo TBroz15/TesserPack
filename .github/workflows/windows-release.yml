@@ -106,8 +106,12 @@ jobs:
           )
 
           foreach ($dll in $Dlls) {
-              Copy-Item -Path "$MSYS_BIN\$dll" -Destination "${{ github.workspace }}\bin" -Force
+              Copy-Item -Path "$MSYS_BIN\$dll" -Destination "${{ github.workspace }}" -Force
           }
+
+      - name: wer is my lib bips
+        run: pkg-config --libs --cflags vips
+        shell: msys2 {0}
 
       - name: Run GoReleaser (Windows)
         uses: goreleaser/goreleaser-action@v6
@@ -123,7 +127,3 @@ jobs:
           CGO_LDFLAGS: "-LD:\\a\\_temp\\msys64\\mingw64\\lib"
           PKG_CONFIG_PATH: "${{ github.workspace }}\\vips-dev-8.17\\lib\\pkgconfig"
           GOEXPERIMENT: "jsonv2"
-
-      - name: wer is my lib bips
-        run: pkg-config --libs --cflags vips
-        shell: msys2 {0}
