@@ -67,29 +67,53 @@ jobs:
           git clone https://github.com/libvips/libvips.git
           cd libvips
 
+          # this command is long as my dih -tuxebro
           meson setup build \
-            --prefix=$MINGW_PREFIX \
+            --prefix=/mingw64 \
             --buildtype=release \
             -Ddeprecated=false \
+            -Dexamples=false \
             -Dmodules=disabled \
             -Dintrospection=disabled \
-            -Dexamples=false \
+            -Dcplusplus=false \
+            -Dvapi=false \
             -Djpeg=enabled \
-            -Dhighway=enabled \
-            -Dpng=enabled \
+            -Dspng=enabled \
             -Dimagequant=enabled \
+            -Dhighway=enabled \
             -Dtiff=disabled \
             -Dwebp=disabled \
             -Dheif=disabled \
+            -Dheif-module=disabled \
             -Dpdfium=disabled \
             -Dopenslide=disabled \
+            -Dopenslide-module=disabled \
             -Dorc=disabled \
-            -Dexif=disabled \
             -Dcfitsio=disabled \
-            -Dpangocairo=disabled \
+            -Dcgif=disabled \
+            -Dexif=disabled \
             -Dfftw=disabled \
-            -Dlcms=disabled \
-            -Dmatio=disabled
+            -Dfontconfig=disabled \
+            -Darchive=disabled \
+            -Duhdr=disabled \
+            -Djpeg-xl=disabled \
+            -Djpeg-xl-module=disabled \
+            -Dmagick=disabled \
+            -Dmatio=disabled \
+            -Dnifti=disabled \
+            -Dopenexr=disabled \
+            -Dopenjpeg=disabled \
+            -Dpangocairo=disabled \
+            -Dpoppler=disabled \
+            -Dpoppler-module=disabled \
+            -Dquantizr=disabled \
+            -Draw=disabled \
+            -Drsvg=disabled \
+            -Dzlib=disabled \
+            -Dnsgif=false \
+            -Dppm=false \
+            -Danalyze=false \
+            -Dradiance=false
 
           meson compile -C build
           meson install -C build
