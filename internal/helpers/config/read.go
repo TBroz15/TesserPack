@@ -47,16 +47,16 @@ func customMerge(dst, src interface{}, useMergo bool) error {
 func ReadConf(inPath, confPath string) types.TesserPackConfig {
 	conf := NewDefault()
 
-	// if user did not define confPath via CLI
+	// if user did not define confPath via CLI, check inside of pack
 	if confPath == "" {
 		confPath = path.Join(inPath, ".tesserpackrc.json5")
 	}
 
 	confFileCont, err := os.ReadFile(confPath)
 	if err != nil && confPath != "" {
-		log.Fatal("Failed to read config.", "err", err)
-	} else if err != nil {
 		return conf
+	} else if err != nil {
+		log.Fatal("Failed to read config.", "err", err)
 	}
 
 	messageFromTuxeBro := "That should not happen. If it does, report to me!"
