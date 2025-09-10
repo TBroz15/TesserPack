@@ -68,24 +68,21 @@ jobs:
           cd libvips
 
           meson setup build \
-              --prefix=$MINGW_PREFIX \
-              --buildtype=release \
-              -Ddeprecated=false \
-              -Dmodules=disabled \
-              -Dintrospection=disabled \
-              -Dexamples=false \
-              -Djpeg=enabled \
-              -Dmozjpeg=enabled \
-              -Dpng=enabled \
-              -Dspng=enabled \
-              -Dimagequant=enabled \
-              -Dhighway=enabled \
-              -Dtiff=disabled \
-              -Dwebp=disabled \
-              -Dheif=disabled \
-              -Dpdfium=disabled \
-              -Dopenslide=disabled \
-              -Dorc=disabled
+            --prefix=$MINGW_PREFIX \
+            --buildtype=release \
+            -Ddeprecated=false \
+            -Dmodules=disabled \
+            -Dintrospection=disabled \
+            -Dexamples=false \
+            -Djpeg=enabled \
+            -Dpng=enabled \
+            -Dimagequant=enabled \
+            -Dtiff=disabled \
+            -Dwebp=disabled \
+            -Dheif=disabled \
+            -Dpdfium=disabled \
+            -Dopenslide=disabled \
+            -Dorc=disabled
 
           meson compile -C build
           meson install -C build
