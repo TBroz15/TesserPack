@@ -114,8 +114,8 @@ jobs:
             -Dppm=false \
             -Danalyze=false \
             -Dradiance=false \
-            -Dlcms=false \
-            -Dcpp=false
+            -Dlcms=disabled \
+            -Dcpp-docs=false
 
           meson compile -C build
           meson install -C build
