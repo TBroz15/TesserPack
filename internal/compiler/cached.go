@@ -20,6 +20,7 @@ type Cached struct {
 	conf *types.CompilerConfig
 	waitGroup *sync.WaitGroup
 	basePath string
+	sem *helpers.Semaphore
 
 	pngConfHash string
 	jpgConfHash string
@@ -47,7 +48,7 @@ func createConfHash(conf interface{}) string {
 	return u64ToHexFixed(xxhash.Sum64(out))
 }
 
-func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath string) *Cached {
+func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath string, semaphore *helpers.Semaphore) *Cached {
 	cacheDir 	  := path.Join(helpers.TempDir, "cache")
 
 	cacheListFile := path.Join(cacheDir, ".cache_list")
@@ -62,6 +63,7 @@ func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath s
 		conf: 	   conf,
 		waitGroup: waitGroup,
 		basePath:  basePath,
+		sem:	   semaphore,
 
 		pngConfHash: createConfHash(conf.PNG),
 		jpgConfHash: createConfHash(conf.JPG),
@@ -76,6 +78,9 @@ func NewCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath s
 
 func (c *Cached) Process(srcFile, outFile, ext string, processor types.ProcessorFunc) {
 	defer c.waitGroup.Done()
+
+	c.sem.Acquire()
+	defer c.sem.Release()
 
 	baseFile, err := filepath.Rel(c.basePath, srcFile)
 	if err != nil {

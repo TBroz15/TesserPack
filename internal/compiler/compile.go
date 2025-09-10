@@ -75,11 +75,12 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 	operTime.walkAndSort = time.Since(timeNow)
 
 	var p types.Processor
+	sem := helpers.NewSemaphore(50)
 
 	if conf.Compiler.Cache {
-		p = NewCached(&conf.Compiler, &waitGroup, inPath)
+		p = NewCached(&conf.Compiler, &waitGroup, inPath, sem)
 	} else {
-		p = NewNonCached(&conf.Compiler, &waitGroup, inPath)
+		p = NewNonCached(&conf.Compiler, &waitGroup, inPath, sem)
 	}
 
 

@@ -14,18 +14,23 @@ type NonCached struct {
 	conf *types.CompilerConfig
 	waitGroup *sync.WaitGroup
 	basePath string
+	sem *helpers.Semaphore
 }
 
-func NewNonCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath string) *NonCached {
+func NewNonCached(conf *types.CompilerConfig, waitGroup *sync.WaitGroup, basePath string, semaphore *helpers.Semaphore) *NonCached {
 	return &NonCached{
 		conf: 	   conf,
 		waitGroup: waitGroup,
 		basePath:  basePath,
+		sem:	   semaphore,
 	}
 }
 
 func (c* NonCached) Process(srcFile, outFile, ext string, processor types.ProcessorFunc) {
 	defer c.waitGroup.Done()
+
+	c.sem.Acquire()
+	defer c.sem.Release()
 
 	baseFile, err := filepath.Rel(c.basePath, srcFile)
 	if err != nil {
