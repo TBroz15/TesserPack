@@ -9,9 +9,9 @@
 name: release
 
 on:
-  push:
-    tags:
-      - 'v*'           # run on git tags like v1.2.3; adjust if you prefer manual dispatch
+  # push:
+  #   tags:
+  #     - 'v*'           # run on git tags like v1.2.3; adjust if you prefer manual dispatch
   workflow_dispatch:
     
 # omg i wasted a day and 4 hourse for this

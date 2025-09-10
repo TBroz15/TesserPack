@@ -125,5 +125,5 @@ jobs:
           CGO_ENABLED: 1
           CGO_CFLAGS: "-ID:\\a\\_temp\\msys64\\mingw64\\include -ID:\\a\\_temp\\msys64\\mingw64\\include\\glib-2.0 -ID:\\a\\_temp\\msys64\\mingw64\\lib\\glib-2.0\\include"
           CGO_LDFLAGS: "-LD:\\a\\_temp\\msys64\\mingw64\\lib"
-          PKG_CONFIG_PATH: "${{ github.workspace }}\\vips-dev-8.17\\lib\\pkgconfig"
+          PKG_CONFIG_PATH: "D:\\a\\_temp\\msys64\\mingw64\\lib\\pkgconfig"
           GOEXPERIMENT: "jsonv2"
