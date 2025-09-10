@@ -48,12 +48,12 @@ jobs:
       - name: Make Temporary Directory
         shell: msys2 {0}
         run: |
-          mkdir /tmp
+          mkdir /tempdir
       
       - name: Build MozJpeg
         shell: msys2 {0}
         run: |
-          cd /tmp
+          cd /tempdir
           git clone https://github.com/mozilla/mozjpeg.git
           cd mozjpeg
           mkdir build && cd build
@@ -65,7 +65,7 @@ jobs:
       - name: Build Libvips
         shell: msys2 {0}
         run: |
-          cd /tmp
+          cd /tempdir
           git clone https://github.com/libvips/libvips.git
           cd libvips
 
