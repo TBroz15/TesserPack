@@ -109,11 +109,13 @@ jobs:
             -Dquantizr=disabled \
             -Draw=disabled \
             -Drsvg=disabled \
-            -Dzlib=disabled \
+            -Dzlib=enabled \
             -Dnsgif=false \
             -Dppm=false \
             -Danalyze=false \
-            -Dradiance=false
+            -Dradiance=false \
+            -Dlcms=false \
+            -Dcpp=false
 
           meson compile -C build
           meson install -C build
@@ -134,7 +136,11 @@ jobs:
               "libexpat-1.dll",
               "libarchive-13.dll",
               "libintl-8.dll",
-              "libffi-8.dll"
+              "libffi-8.dll",
+              "zlib1.dll",
+              "libgmodule-2.0-0.dll",
+              "libpcre2-8-0.dll",
+              "libgcc_s_seh-1.dll"
           )
 
           foreach ($dll in $Dlls) {
