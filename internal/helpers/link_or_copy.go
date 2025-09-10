@@ -14,17 +14,27 @@ func LinkOrCopy(src, dest string) (error) {
 }
 
 func copyFile(src, dest string) (error) {
-	in, err := os.Open(src)
-	if (err != nil) {return err}
-	defer in.Close()
+    in, err := os.Open(src)
+    if err != nil {
+        return err
+    }
+    defer in.Close()
 
-	out, err := os.Create(dest)
-	if (err != nil) {return err}
-	defer out.Close()
+    out, err := os.Create(dest)
+    if err != nil {
+        in.Close() // ensure input is closed
+        return err
+    }
+    defer func() {
+        // make sure file is closed even on io.Copy or Sync error
+        cerr := out.Close()
+        if err == nil {
+            err = cerr
+        }
+    }()
 
-	if _, err = io.Copy(out, in); err != nil {
-		return err
-	}
-
-	return out.Sync()
+    if _, err = io.Copy(out, in); err != nil {
+        return err
+    }
+    return out.Sync()
 }
