@@ -31,7 +31,7 @@ This guide will definitely help you save some time without countless trials and 
 1. [Download and install Go](https://go.dev/dl/) `>=` 1.25 if you haven't. Read the [guide](https://go.dev/doc/tutorial/getting-started#prerequisites) if you also haven't.
 2. [Download Libvips](https://github.com/libvips/build-win64-mxe/releases/download/v8.17.1/vips-dev-w64-web-8.17.1.zip) and extract it.
 3. Go to the extracted directory and put `vips-dev-8.17` into `C:\`.
-4. [Download and install MSYS2](https://github.com/msys2/msys2-installer/releases/download/2024-12-08/msys2-x86_64-20241208.exe) and follow installation wizard if not installed. Make sure that `Run MSYS2 now` is checked before finishing.
+4. [Download and install MSYS2](https://www.msys2.org/#installation) and follow installation wizard if not installed. Make sure that `Run MSYS2 now` is checked before finishing.
 5. In MSYS2, install some packages by `pacman -S --needed base-devel mingw-w64-ucrt-x86_64-toolchain`. Just press enter and then enter `Y` to install.
 6. Add Environmental Variables in Powershell and restart your terminal. (you don't need epic admin powers btw...)
     ```powershell
