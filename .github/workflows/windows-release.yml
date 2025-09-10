@@ -57,9 +57,7 @@ jobs:
           git clone https://github.com/mozilla/mozjpeg.git
           cd mozjpeg
           mkdir build && cd build
-          cmake -G Ninja \
-              -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_INSTALL_PREFIX=$PREFIX ..
+          cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$MINGW_PREFIX ..
           ninja install
 
       - name: Build Libvips
