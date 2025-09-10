@@ -75,7 +75,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 	operTime.walkAndSort = time.Since(timeNow)
 
 	var p types.Processor
-	sem := helpers.NewSemaphore(50)
+	sem := helpers.NewSemaphore(50) // this is temporary. it will be replaced by thread pool by v1
 
 	if conf.Compiler.Cache {
 		p = NewCached(&conf.Compiler, &waitGroup, inPath, sem)
