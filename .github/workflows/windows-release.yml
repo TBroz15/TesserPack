@@ -86,7 +86,10 @@ jobs:
             -Dorc=disabled \
             -Dexif=disabled \
             -Dcfitsio=disabled \
-            -Dpangocairo=disabled
+            -Dpangocairo=disabled \
+            -Dfftw=disabled \
+            -Dlcms=disabled \
+            -Dmatio=disabled
 
           meson compile -C build
           meson install -C build
