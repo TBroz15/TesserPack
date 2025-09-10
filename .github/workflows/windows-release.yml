@@ -5,12 +5,7 @@ on:
     tags:
       - 'v*'           # run on git tags like v1.2.3; adjust if you prefer manual dispatch
   workflow_dispatch:
-    # temporary
-    inputs:
-      branch:
-        description: 'Branch to run'
-        required: true
-        default: 'main' # Or your default branch
+
 
 jobs:
   build:
