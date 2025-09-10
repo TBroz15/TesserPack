@@ -37,7 +37,7 @@ jobs:
             mingw-w64-x86_64-cmake 
             mingw-w64-x86_64-ninja 
             mingw-w64-x86_64-meson 
-            mingw-w64-x86_64-git 
+            git 
             mingw-w64-x86_64-glib2 
             mingw-w64-x86_64-highway 
             mingw-w64-x86_64-libspng 
@@ -62,7 +62,7 @@ jobs:
               -DCMAKE_INSTALL_PREFIX=$PREFIX ..
           ninja install
 
-      - name: Build MozJpeg
+      - name: Build Libvips
         shell: msys2 {0}
         run: |
           cd /tmp
