@@ -11,7 +11,7 @@ TesserPack is kinda bare bones right now. PR contributions and how to develop on
 
 ## Development (PR)
 
-These setup instructions assumes that you don't have Go, Libvips, and GCC installed. 
+These setup instructions assumes that you don't have Go, Libvips (with dependencies: mozjpeg, libspng, libimagequant, highway), and GCC installed. 
 
 This guide will definitely help you save some time without countless trials and errors trying to figure out how to setup TesserPack.
 
