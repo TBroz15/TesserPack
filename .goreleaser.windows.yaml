@@ -30,7 +30,7 @@ archives:
       - "THIRD_PARTY_LICENSES.md"
       - "README.md"
       - "LICENSE"
-      - "license/*"
+      - "licenses/*"
 
 changelog:
   sort: asc
