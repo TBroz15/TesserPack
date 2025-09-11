@@ -154,6 +154,64 @@ jobs:
         run: pkg-config --libs --cflags vips
         shell: msys2 {0}
 
+      - name: Get Licenses of Libraries (look mom, im a law abiding citizen!)
+        run: |
+          $licensesDir = ".\licenses"
+
+          if (-not (Test-Path $licensesDir)) {
+              New-Item -ItemType Directory -Path $licensesDir | Out-Null
+          }
+
+          echo "Downloading third-party licenses..."
+
+          # libvips
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/libvips/libvips/refs/heads/master/LICENSE" -OutFile "$licensesDir\libvips"
+
+          # MozJPEG
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/mozilla/mozjpeg/refs/heads/master/LICENSE.md" -OutFile "$licensesDir\mozjpeg"
+
+          # libspng
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/randy408/libspng/refs/heads/master/LICENSE" -OutFile "$licensesDir\libspng"
+
+          # libimagequant
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ImageOptim/libimagequant/refs/heads/main/COPYRIGHT" -OutFile "$licensesDir\libimagequant"
+
+          # Highway
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/google/highway/refs/heads/master/LICENSE-BSD3" -OutFile "$licensesDir\highway"
+
+          # GLib / GObject / GIO / GModule
+          Invoke-WebRequest -Uri "https://gitlab.gnome.org/GNOME/glib/-/raw/main/LICENSES/LGPL-2.1-or-later.txt" -OutFile "$licensesDir\glib"
+
+          # libexpat
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/libexpat/libexpat/refs/heads/master/COPYING" -OutFile "$licensesDir\libexpat"
+
+          # libarchive
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/libarchive/libarchive/refs/heads/master/COPYING" -OutFile "$licensesDir\libarchive"
+
+          # libintl
+          $gettextTar = "$env:TEMP\gettext.tar.gz"
+          Invoke-WebRequest -Uri "https://ftp.gnu.org/gnu/gettext/gettext-0.21.tar.gz" -OutFile $gettextTar
+          tar -xzf $gettextTar -C $env:TEMP "gettext-0.21/gettext-runtime/intl"
+          Copy-Item "$env:TEMP\gettext-0.21\gettext-runtime\intl\COPYING.LIB" "$licensesDir\libintl"
+          
+          # libffi
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/libffi/libffi/refs/heads/master/LICENSE" -OutFile "$licensesDir\libffi"
+
+          # zlib
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/madler/zlib/refs/heads/develop/LICENSE" -OutFile "$licensesDir\zlib"
+
+          # libpcre2
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/PCRE2Project/pcre2/refs/heads/master/LICENCE.md" -OutFile "$licensesDir\libpcre2"
+
+          # mingw
+          Invoke-WebRequest -Uri "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/COPYING?format=raw" -OutFile "$licensesDir\mingw"
+
+          # libiconv
+          $libiconvTar = "$env:TEMP\libiconv.tar.gz"
+          Invoke-WebRequest -Uri "https://ftp.gnu.org/gnu/libiconv/libiconv-1.18.tar.gz" -OutFile $libiconvTar
+          tar -xzf $libiconvTar -C $env:TEMP "libiconv-1.18/"
+          Copy-Item "$env:TEMP\libiconv-1.18\COPYING.LIB" "$licensesDir\libiconv"
+
       - name: Run GoReleaser (Windows)
         uses: goreleaser/goreleaser-action@v6
         with:

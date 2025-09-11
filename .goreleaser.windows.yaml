@@ -26,9 +26,11 @@ archives:
       - goos: windows
         formats: [zip]
     files:
-      - "*.dll" 
+      - "*.dll"
+      - "THIRD_PARTY_LICENSES.md"
       - "README.md"
       - "LICENSE"
+      - "license/*"
 
 changelog:
   sort: asc
