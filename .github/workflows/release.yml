@@ -9,9 +9,9 @@
 name: release
 
 on:
-  # push:
-  #   tags:
-  #     - 'v*'           # run on git tags like v1.2.3; adjust if you prefer manual dispatch
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     
 # omg i wasted a day and 4 hourse for this
@@ -36,7 +36,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25.0'   # change to your Go version
+          go-version: '1.25.0'
 
       - name: Install MSYS2 and MinGW (Windows)
         if: runner.os == 'Windows'    
@@ -91,18 +91,11 @@ jobs:
           Get-ChildItem -Path "${{ github.workspace }}\\vips-dev-8.17\\bin" -Filter "*.dll" -Recurse | Move-Item -Destination "${{ github.workspace }}"
         shell: powershell
 
-      - name: Copy Libvips Shared Objects (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          mkdir -p ./lib/
-          sudo cp /usr/local/lib/x86_64-linux-gnu/libvips*.so* ./lib/
-
       - name: Run GoReleaser (Windows)
         if: runner.os == 'Windows'
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          # 'latest', 'nightly', or a semver
           version: "latest"
           args: release --config .goreleaser.windows.yaml
         env:
@@ -118,7 +111,6 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          # 'latest', 'nightly', or a semver
           version: "latest"
           args: release --config .goreleaser.linux.yaml
         env:
