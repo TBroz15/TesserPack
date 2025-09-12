@@ -7,11 +7,14 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"sync/atomic"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/types"
 	"time"
 
+	"github.com/bmatcuk/doublestar/v4"
 	"github.com/charlievieth/fastwalk"
 	"github.com/charmbracelet/log"
 	"github.com/phuslu/shardmap"
@@ -27,6 +30,15 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 	mutex := sync.RWMutex{}
 
 	filesLen := atomic.Uint32{}
+
+	ignoreGlobPattern := "{" + strings.Join(conf.IgnoreGlob, ",") + "}"
+
+	// Comply with path separators depending on OS
+	if runtime.GOOS == "windows" {
+		ignoreGlobPattern = strings.ReplaceAll(ignoreGlobPattern, "/", "\\")
+	} else {
+		ignoreGlobPattern = strings.ReplaceAll(ignoreGlobPattern, "\\", "/")
+	}
 
 	sortedFiles := types.SortedFiles{
 		JSON: []string{},
@@ -72,6 +84,15 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 		}
 
 		filesLen.Add(1)
+
+		isMatched, err := doublestar.PathMatch(ignoreGlobPattern, rel)
+		if err != nil {
+			log.Error("Failed to match with glob.", "pattern", ignoreGlobPattern, "err", err)
+		}
+
+		if isMatched {
+			return nil
+		}
 
 		mutex.Lock()
 		helpers.SortFile(&sortedFiles, rel)
