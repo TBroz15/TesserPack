@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sync/atomic"
 	"tesserpack/internal/helpers"
 	"tesserpack/internal/types"
 	"time"
@@ -25,7 +26,15 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 	waitGroup := sync.WaitGroup{}
 	mutex := sync.RWMutex{}
 
-	files := []string{}
+	filesLen := atomic.Uint32{}
+
+	sortedFiles := types.SortedFiles{
+		JSON: []string{},
+		LANG: []string{},
+		PNG:  []string{},
+		JPG:  []string{},
+		ETC:  []string{},
+	}
 
 	fastWalkConf := fastwalk.Config{
 		Follow: true,
@@ -62,8 +71,10 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 			return nil
 		}
 
+		filesLen.Add(1)
+
 		mutex.Lock()
-		files = append(files, rel)
+		helpers.SortFile(&sortedFiles, rel)
 		mutex.Unlock()
 		
 		return nil
@@ -71,7 +82,6 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 
 	if (err != nil) {return err}
 
-	sortedFiles := helpers.SortFiles(&files, tempPackDir)
 	operTime.walkAndSort = time.Since(timeNow)
 
 	var p types.Processor
@@ -158,7 +168,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 	log.Infof("Compressing pack to \"%v\"", path.Base(outPath))
 	timeNow = time.Now()
 
-	shardedCompiledFiles := shardmap.New[string, os.FileInfo](len(files))
+	shardedCompiledFiles := shardmap.New[string, os.FileInfo](int(filesLen.Load()))
 	
 	err = fastwalk.Walk(&fastWalkConf, tempPackDir, func(compiledFile string, entry fs.DirEntry, err error) error {
 		if (err != nil) {return err}
