@@ -91,10 +91,10 @@ func configGenPrompt(conf *types.TesserPackConfig) {
 	logFatalOnErr()
 
 	ignoreGlobPatterns := 
-`node_modules/
-.git/
-.vscode/
-.github/
+`node_modules/*
+.git/*
+.vscode/*
+.github/*
 `
 	err = huh.NewForm(
 		huh.NewGroup(

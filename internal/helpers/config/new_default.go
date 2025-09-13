@@ -19,10 +19,10 @@ func NewDefault() types.TesserPackConfig {
 			Cache: true,
 		},
 		IgnoreGlob: []string{
-			"node_modules/",
-			".git/",
-			".vscode/",
-			".github/",
+			"node_modules/*",
+			".git/*",
+			".vscode/*",
+			".github/*",
 		},
 	}
 }
