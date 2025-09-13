@@ -93,7 +93,6 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 		filesLen.Add(1)
 
 		isIgnored := doublestar.PathMatchUnvalidated(ignoreGlobPattern, rel)
-
 		if isIgnored {
 			return nil
 		}
