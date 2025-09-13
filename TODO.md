@@ -6,7 +6,7 @@
 - [x] JSON5 support (pack devs will like this)
 - [x] Proper Linux Support (libvips is the problem)
 - [x] Caching
-- [ ] Config
+- [x] Config
 - [x] (Not so) Proper error checking
 - [ ] v0 GUI w/ wails
 - [ ] Full Refactor for v1
