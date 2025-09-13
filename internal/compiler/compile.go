@@ -31,7 +31,8 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 
 	filesLen := atomic.Uint32{}
 
-	ignoreGlobPattern := "{" + strings.Join(conf.IgnoreGlob, ",") + "}"
+	ignoreGlobPattern := strings.Join(conf.IgnoreGlob, ",")
+	ignoreGlobPattern = "{" + ignoreGlobPattern + "}"
 
 	// Comply with path separators depending on OS
 	if runtime.GOOS == "windows" {
@@ -85,12 +86,12 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 
 		filesLen.Add(1)
 
-		isMatched, err := doublestar.PathMatch(ignoreGlobPattern, rel)
+		isIgnored, err := doublestar.PathMatch(ignoreGlobPattern, rel)
 		if err != nil {
 			log.Error("Failed to match with glob.", "pattern", ignoreGlobPattern, "err", err)
 		}
 
-		if isMatched {
+		if isIgnored {
 			return nil
 		}
 
