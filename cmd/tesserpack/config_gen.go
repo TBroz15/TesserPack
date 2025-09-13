@@ -92,9 +92,13 @@ func configGenPrompt(conf *types.TesserPackConfig) {
 
 	ignoreGlobPatterns := 
 `node_modules/*
+node_modules/**/*
 .git/*
+.git/**/*
 .vscode/*
+.vscode/**/*
 .github/*
+.github/**/*
 `
 	err = huh.NewForm(
 		huh.NewGroup(

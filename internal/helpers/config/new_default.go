@@ -20,9 +20,13 @@ func NewDefault() types.TesserPackConfig {
 		},
 		IgnoreGlob: []string{
 			"node_modules/*",
+			"node_modules/**/*",
 			".git/*",
+			".git/**/*",
 			".vscode/*",
+			".vscode/**/*",
 			".github/*",
+			".github/**/*",
 		},
 	}
 }
