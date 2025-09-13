@@ -209,6 +209,11 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 
 	if (err != nil) {return err}
 
+	if shardedCompiledFiles.Len() == 0 {
+		log.Warn("There are no files in the optimized temporary pack directory. Skipping zip compression...")
+		return nil
+	}
+
 	// turn it into a normal map
 	compiledFiles := map[string]os.FileInfo{}
 	shardedCompiledFiles.Range(func(key string, value os.FileInfo) bool {
