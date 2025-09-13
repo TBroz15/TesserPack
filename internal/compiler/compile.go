@@ -41,6 +41,12 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 		ignoreGlobPattern = strings.ReplaceAll(ignoreGlobPattern, "\\", "/")
 	}
 
+	isPathValid := doublestar.ValidatePathPattern(ignoreGlobPattern)
+	if !isPathValid {
+		log.Fatal("Invalid ignore glob.", "patterns", strings.Join(conf.IgnoreGlob, "\n"))
+	}
+
+
 	sortedFiles := types.SortedFiles{
 		JSON: []string{},
 		LANG: []string{},
@@ -86,10 +92,7 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 
 		filesLen.Add(1)
 
-		isIgnored, err := doublestar.PathMatch(ignoreGlobPattern, rel)
-		if err != nil {
-			log.Error("Failed to match with glob.", "pattern", ignoreGlobPattern, "err", err)
-		}
+		isIgnored := doublestar.PathMatchUnvalidated(ignoreGlobPattern, rel)
 
 		if isIgnored {
 			return nil
