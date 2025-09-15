@@ -46,7 +46,6 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 		log.Fatal("Invalid ignore glob.", "patterns", strings.Join(conf.IgnoreGlob, "\n"))
 	}
 
-
 	sortedFiles := types.SortedFiles{
 		JSON: []string{},
 		LANG: []string{},
@@ -87,6 +86,10 @@ func Compile(inPath, originalInPath, outPath, tempPackDir string, conf *types.Te
 				log.Error("Failed to create dir", "dir", rel, "err", err)
 			}
 
+			return nil
+		}
+
+		if entry.Name() == ".tesserpackrc" {
 			return nil
 		}
 
