@@ -19,7 +19,7 @@ require (
 	github.com/urfave/cli/v3 v3.4.1
 )
 
-require github.com/bmatcuk/doublestar/v4 v4.9.1 // indirect
+require github.com/bmatcuk/doublestar/v4 v4.9.1
 
 require (
 	github.com/atotto/clipboard v0.1.4 // indirect
