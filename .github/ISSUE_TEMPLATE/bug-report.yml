@@ -17,8 +17,8 @@ body:
     attributes:
       label: "Version of TesserPack"
       placeholder: "v0.4.2"
-      validations:
-        required: true
+    validations:
+      required: true
 
   - type: textarea
     id: describe
@@ -39,8 +39,8 @@ body:
         It's fine if you have a snippet (such as affected assets) of your pack, if you want to keep a part of your pack as a secret.
       placeholder: |
         ex. https://github.com/USERNAME/REPO-NAME, https://drive.google.com/[...]
-      validations:
-        required: true
+    validations:
+      required: true
 
   - type: textarea
     id: reprod-steps
