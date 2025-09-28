@@ -9,21 +9,24 @@
 - [x] Config
 - [x] (Not so) Proper error checking
 - [ ] v0 GUI w/ wails
-- [ ] Full Refactor for v1
+- [ ] Do some optimizations and memory leak fix (ive learnt a lesson to not optimize until all the program features is ready)
+    - [ ] Streamlike way of compiling
+    - [ ] Multithreaded assets processing
+    - [ ] Option for Multithreading
+        - [ ] Thread Pool for Multithreading
+        - [ ] Unbound Goroutines
 - [ ] Github Wiki for Effective Usage 
 - [ ] Add Tests
+- [ ] Full Refactor for v1
+    - [ ] Check if TesserPack is feasible for v1
 
 ### After v1.0
 
-- [ ] v1 GUI (when TesserPack-GUI is considered to be complete)
+- [ ] v1 GUI
 - [ ] Minify JS & TS through ESBuild (TBD by v1.1)
 - [ ] Graceful Shutdown
 - [ ] Regolith Integration ([#1](https://github.com/TBroz15/TesserPack/issues/1))
 - [ ] Audio Optimization
-- [ ] Do some optimizations and memory leak fix (ive learnt a lesson to not optimize until all the program features is ready)
-    - [ ] Streamlike way of compiling
-    - [ ] Thread Pool for Multithreading (also add option for unli-Goroutines)
-    - [ ] Multithreaded assets processing
 
 ### Near To Complete (kinda hard but possible)
 
