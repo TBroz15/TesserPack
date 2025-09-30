@@ -10,11 +10,12 @@
 - [x] (Not so) Proper error checking
 - [ ] v0 GUI w/ wails
 - [ ] Do some optimizations and memory leak fix (ive learnt a lesson to not optimize until all the program features is ready)
-    - [ ] Streamlike way of compiling
-    - [ ] Multithreaded assets processing
-    - [ ] Option for Multithreading
+    - [ ] Different Method for Multithreading
         - [ ] Thread Pool for Multithreading
         - [ ] Unbound Goroutines
+    - [ ] Concurrent assets processing (remove mutex & use semaphore)
+    - [ ] Metadata Caching (use hashing as fallback)
+    - [ ] Streamlike way of compiling
 - [ ] Github Wiki for Effective Usage 
 - [ ] Add Tests
 - [ ] Full Refactor for v1
