@@ -32,6 +32,6 @@
 
 ### Near To Complete (kinda hard but possible)
 
-- [ ] Mac Support
 - [ ] TesserPack as Go package (kinda possible, just the libvips is the problem)
 - [ ] Full Minecraft Java Edition Support
+- [ ] Smart Image Optimization (depending on resolution like 16x16, 32x32, 64x64, etc.)
