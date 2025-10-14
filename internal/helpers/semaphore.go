@@ -4,7 +4,7 @@ import (
 	"context"
 	"runtime"
 
-	"github.com/marusama/semaphore"
+	"github.com/marusama/semaphore/v2"
 )
 
 type Semaphore struct {

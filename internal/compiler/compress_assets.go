@@ -1,10 +1,12 @@
 package compiler
 
 import (
-	"sync"
+	"context"
+	"runtime"
 	"tesserpack/internal/types"
 
 	"github.com/cshum/vipsgen/vips"
+	"github.com/marusama/semaphore/v2"
 )
 
 // todo for tuxebro: compress assets concurrently without exploding the PC (TBD by above v1)
@@ -36,11 +38,20 @@ func SetJpgOptions(config *types.JPGConfig) {
 	jpgOptions.Q = int(config.Q)
 }
 
-var m sync.Mutex
+var sem = func () semaphore.Semaphore {
+	// only have one thread not doing anything by default (this is temporary)
+	numCPU := runtime.NumCPU() - 1
+
+	if (numCPU <= 0) {
+		numCPU = 1;
+	}
+	
+	return semaphore.New(numCPU)	
+}()
 
 var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig) (processedData []byte, err error) {
-	m.Lock()
-	defer m.Unlock()
+	sem.Acquire(context.Background(), 1)
+	defer sem.Release(1)
 	
 	img, err := vips.NewPngloadBuffer(*data, nil)
 	if err != nil {
@@ -63,8 +74,8 @@ var CompressPNG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFil
 }
 
 var CompressJPG types.ProcessorFunc = func(data *[]byte, outFile *string, srcFile *string, conf *types.CompilerConfig) (processedData []byte, err error) {
-	m.Lock()
-	defer m.Unlock()
+	sem.Acquire(context.Background(), 1)
+	defer sem.Release(1)
 	
 	img, err := vips.NewJpegloadBuffer(*data, nil)
 	if err != nil {
