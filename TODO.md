@@ -13,7 +13,7 @@
     - [ ] Different Method for Multithreading
         - [ ] Thread Pool for Multithreading
         - [ ] Unbound Goroutines
-    - [ ] Concurrent assets processing (remove mutex & use semaphore)
+    - [x] Concurrent assets processing (remove mutex & use semaphore)
     - [ ] Metadata Caching (use hashing as fallback)
     - [ ] Streamlike way of compiling
 - [ ] Github Wiki for Effective Usage 
