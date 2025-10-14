@@ -18,6 +18,7 @@
     - [ ] Streamlike way of compiling
 - [ ] Github Wiki for Effective Usage 
 - [ ] Add Tests
+- [ ] ARM64 Support
 - [ ] Full Refactor for v1
     - [ ] Check if TesserPack is feasible for v1
 
@@ -32,6 +33,5 @@
 ### Near To Complete (kinda hard but possible)
 
 - [ ] Mac Support
-- [ ] ARM64 Support
 - [ ] TesserPack as Go package (kinda possible, just the libvips is the problem)
 - [ ] Full Minecraft Java Edition Support
