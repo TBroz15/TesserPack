@@ -29,6 +29,7 @@
 - [ ] Graceful Shutdown
 - [ ] Regolith Integration ([#1](https://github.com/TBroz15/TesserPack/issues/1))
 - [ ] Audio Optimization
+- [ ] Slightly Faster Zip compression
 
 ### Near To Complete (kinda hard but possible)
 
